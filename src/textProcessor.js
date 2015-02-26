@@ -162,32 +162,31 @@ function textProcessor(inputString) {
     });
 
 
-    function isMm(pos) { return configurator.mm.indexOf(parseInt(pos)) !== -1; }
-    function isMmStop(pos) { return configurator.mmstop.indexOf(parseInt(pos)) !== -1; }
+    function getParent(node, pos) {
+        var nodeIndex = pos - 1;
+        var previousNode = basic_nodes[nodeIndex];
+        while (getLevel(previousNode, nodeIndex) != getLevel(node) - 1) {
+            nodeIndex -= 1;
+            previousNode = basic_nodes[nodeIndex];
+        }
+        return previousNode;
+    }
+
+    function getLevel(node, pos) {
+        var level = 0;
+        var c = node.name.charAt(level);
+        while (c == ' ') {
+            level += 1;
+            c = node.name.charAt(level);
+        }
+        return level;
+    }
+
     function addLinkToPos(pos, link) { basic_nodes[pos].link = basic_nodes[pos].link.concat(link); }
 
-    var depth = 0;
-    var name_on_level = [];
-    var capture = false;
     for (i in basic_nodes) {
-        if (capture) {
-            addLinkToPos(i, [name_on_level[depth]]);
-
-            if (isMm(i)) {
-                depth++;
-                name_on_level[depth] = basic_nodes[i].name;
-            }
-        }
-
-        if (isMm(i) && !capture) {
-            capture = true;
-            depth++;
-            name_on_level[depth] = basic_nodes[i].name;
-        }
-
-        if (isMmStop(i)) {
-            depth--;
-            if (depth < 0) {console.error('Wrong with something?');}
+        if (getLevel(basic_nodes[i], i) > 0) {
+            addLinkToPos(i, getParent(basic_nodes[i], i).name);
         }
     }
 
