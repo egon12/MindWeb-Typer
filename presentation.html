@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Presentation</title>
+    <style>
+
+* {
+    padding:0;
+    margin:0;
+}
+
+h1#slide-title {
+    padding : 4px 0 8px;
+    font-family : "Aileron UltraLight";
+    text-align : center;
+    font-size : 70px;
+}
+
+div#vis {
+    padding : 8px;
+
+}
+
+#input-form
+{
+    position:fixed;
+    bottom:0;
+    right:0;
+    opacity : 0.1;
+    width:200px;
+}
+
+#input-form:hover, #input-form:focus
+{
+    opacity : 1;
+}
+
+#input-form-content
+{
+    width:100%;
+    height:350px;
+}
+
+#input-form-options
+{
+    width:100%;
+    height:100px;
+}
+
+#input-form-local
+{
+    width:100px;
+}
+    </style>
+    
+</head>
+<body id="Hallo" onload="">
+    <h1 id="slide-title"></h1>
+    <div id="vis">
+    </div>
+    <form id="input-form">
+        <input type="number" id="input-form-local">
+        <textarea id="input-form-content"></textarea><br>
+        <textarea id="input-form-options"></textarea><br>
+        <input type="submit" value="Save">
+        <button type="button" id="file-button">File</button>
+        <input type="file" id="input-form-file">
+    </form>
+    
+    <script type="text/javascript" charset="utf-8" src="lib/d3/d3.min.js"></script>
+    <script src="src/presentation.js"></script>
+</body>
+</html>

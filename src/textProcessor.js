@@ -10,221 +10,188 @@ function textProcessor(inputString) {
     var color = 'steelblue';
     var link = [];
 
-    var tempSettings = {
-        orientation : "down",
-        staticPosition : 0,
-        offsetPosition : 0,
+    var configurator = {
+        nextPosition : {0:'below'},
+        nextPositionIndex : [0],
 
-        link : [],
+        flow : [],
+        flowstop : [],
 
-        mm : '',
-        nomm : '', 
-
-        flow:false,
-
+        mm : [],
+        mmstop : []
     };
 
-    function tempSettingVertical(staticX, startYPosition) {
-        tempSettings.orientation = 'down';
-        tempSettings.staticPosition = staticX;
-        tempSettings.offsetPosition = startYPosition;
-    }
+    function getNamePositionLink(s, pos) {
 
-    function tempSettingHorizontal(staticY, startXPosition) {
-        tempSettings.orientation = "right";
-        tempSettings.staticPosition = staticY;
-        tempSettings.offsetPosition = startXPosition;
-    }
+        var name, x, y, link;
+        var a = s.split(";");
 
-    function setPositionByTempSettings(pos) {
-        if (tempSettings.orientation == 'down') {
-            x = tempSettings.staticPosition;
-            y = pos - tempSettings.offsetPosition;
-        } else if (tempSettings.orientation == 'right') {
-            x = pos - tempSettings.offsetPosition;
-            y = tempSettings.staticPosition;
-        }
-    }
-
-    function modifyLinkByTempSettings() {
-        link = link.concat(tempSettings.link);
-    }
-
-    function modifyLinkByTempSettingsMm()
-    {
-        if (tempSettings.mm !== "" && link.indexOf(tempSettings.mm) == -1) {
-            link.push(tempSettings.mm);
-        } 
-
-        var tsIndex = null;
-        if (tempSettings.nomm !== "" && (tsIndex = link.indexOf(tempSettings.nomm)) !== -1) {
-            link.splice(tsIndex, 1);
-            tempSettings.nomm =  [];
-        }
-    }
-
-    function processName(nameFromArray) {
-        var a = nameFromArray.split(':');
+        // name
         name = a.shift();
-
-        a.forEach(function(setting, i) {
-
-            if (color_names.indexOf(setting) !== -1) {
-                color = setting;
-                return;
+        // x
+        if (!isNaN(a[0])) { 
+            x = a.shift(); 
+            // y
+            if (!isNaN(a[0])) { 
+                y = a.shift(); 
             }
+        } else if (['hor', 'ver', 'right', 'left', 'top', 'down', 'above', 'below'].indexOf(a[0]) !== -1) {
+            configurator.nextPosition[pos] = a.shift();
+        } 
+        if (x === undefined && pos === 0) { x = 0; y = 0; }
+        link = a;
+        return [name, x, y, link];
+    }
 
-            switch (setting) {
-                case 'mm':
-                    tempSettings.nomm = tempSettings.mm;
-                    tempSettings.mm = name;
+    function getColor(s) {
+        var t = s.split(";");
+        for (var i in t) {
+            if (color_names.indexOf(t[i]) !== -1) {
+                return t[i];
+            }
+        }
+        return 'steelblue';
+    }
+
+    function processSettings(s, pos) {
+        var t = s.split(";");
+
+        for (var i in t) {
+            switch (t[i]) {
+                case 'hor':
+                    configurator.nextPosition[pos] = 'right';
                     break;
-                case 'nomm':
-                    tempSettings.mm = "";
-                    tempSettings.nomm = name;
+                case 'ver':
+                    configurator.nextPosition[pos] = 'below';
                     break;
-                case 'link':
-                    tempSettings.link = [name];
+
+                case 'flow':
+                    configurator.flow.push(pos);
                     break;
-                case 'nolink':
-                    tempSettings.link = [];
+                case 'flowstop':
+                    configurator.flowstop.push(pos);
                     break;
-            } 
-        });
+
+                case 'mm' :
+                    configurator.mm.push(pos);
+                    break;
+
+                case 'mmstop' :
+                    configurator.mmstop.push(pos);
+                    break;
+            }
+        }
     }
 
 
-    return inputString.split("\n")
-        .filter(function(s,i) {
-            return s !== '';
-        })
-    .map(function(s, pos) {
 
-        /**
-          a = Name Position and Link 
-          t = Color Size and Link Modifier
-          */
+    var basic_nodes = inputString.split("\n").filter(function(s,i) { return s !== '';});
+    basic_nodes = basic_nodes.map(function(s, pos) {
+
         s = s.split('|');
+
         var node = {};
 
-        var t = null;
-
-        if (s.length > 1) {
-
-            t = s[1].split(";");
-
-        }
-
-
         /* set Name Position and Link */
-        var a = s[0].split(";");
-
-        node.name = a.shift();
-        node.color = "steelblue";
-
-        //set node.x
-        if (typeof a[0] === 'number') {
-            node.x = a.shift();
-        }
-
-        // set node.y
-        if (typeof a[0] === 'number') {
-            node.y = a.shift();
-        }
-
-        // set link
+        var namePositionLink = getNamePositionLink(s[0], pos);
+        node.name = namePositionLink[0];
+        node.x = namePositionLink[1];
+        node.y = namePositionLink[2];
         if (node.link === undefined) {
             node.link = [];
         }
-        node.link.concat(a);
+        node.link = node.link.concat(namePositionLink[3]);
 
-        if (node.x !== undefined) {
-            tempSettingVertical(node.x, pos - parseInt(node.y));
+        /* set Color and modify link by tempSetting */
+        // default color
+        node.color = s.length > 1 ? getColor(s[1]) : 'steelblue';
+
+        if (s.length > 1) {
+            processSettings(s[1], pos);
         }
-
-
-        if (node.x === undefined) {
-            setPositionByTempSettings(pos);
-            node.x = x;
-            node.y = y;
-        } else if (node.y === undefined) {
-            node.y = 0;
-        }
-
-
-        return node;
-
-
-        processName(a[0]);
-        link = [];
-
-        switch(true) {
-
-            case (a.length == 1):
-                setPositionByTempSettings(pos);
-                break;
-
-            case (a.length >= 3 && a[1] == '_'):
-                tempSettingHorizontal(a[2], pos);
-                a.shift();
-                a.shift();
-                a.shift();
-                link = link.concat(a);
-                setPositionByTempSettings(pos);
-                break;
-
-            case (a.length >= 3 && a[1].match(/-?[0-9]*_/) !== null):
-                var startXPosition = pos - parseInt(a[1].replace("_",""));
-                tempSettingHorizontal(a[2], startXPosition);
-                a.shift();
-                a.shift();
-                a.shift();
-                link = link.concat(a);
-                setPositionByTempSettings(pos);
-                break;
-
-
-            case (a.length == 2 && !isNaN(a[1])):
-                //length 2 and a number?
-                tempSettingVertical(a[1], pos);
-                setPositionByTempSettings(pos);
-                break;
-
-            case (a.length >= 2 && isNaN(a[1])):
-                a.shift();
-                link = link.concat(a);
-                setPositionByTempSettings(pos);
-
-                break;
-
-            case (a.length >= 3):
-                a.shift();
-                x = a.shift();
-                y = a.shift();
-                link = link.concat(a);
-                break;
-
-        }
-
-        modifyLinkByTempSettings();
-
-        var node =  {
-            name : name,
-            x : x,
-            y : y,
-            color : color,
-            link : link
-        };
-
-        /**
-          todo why this is not work?
-
-         */
-        //modifyLinkByTempSettingsMm();
-
         return node;
     });
 
+    /** set automatic position **/
+    var orientation = configurator.nextPosition[0];
+
+    for (var i = 0; i < basic_nodes.length; i++) {
+
+        if (configurator.nextPosition[i]) {
+            orientation = configurator.nextPosition[i];
+        }
+
+        if (basic_nodes[i].x === undefined) {
+            switch(orientation) {
+                case 'below':
+                    basic_nodes[i].x = basic_nodes[i - 1].x;
+                    basic_nodes[i].y = parseInt(basic_nodes[i - 1].y) + 1;
+                    break;
+                case 'above':
+                    basic_nodes[i].x = basic_nodes[i - 1].x;
+                    basic_nodes[i].y = parseInt(basic_nodes[i - 1].y) - 1;
+                    break;
+                case 'right':
+                    basic_nodes[i].x = parseInt(basic_nodes[i - 1].x) + 1;
+                    basic_nodes[i].y = basic_nodes[i - 1].y;
+                    break;
+                case 'left':
+                    basic_nodes[i].x = parseInt(basic_nodes[i - 1].x) - 1;
+                    basic_nodes[i].y = basic_nodes[i - 1].y;
+                    break;
+            }
+        }
+    }
+    
+
+    configurator.flow.forEach(function(flowStart, pos) {
+        var flowTo, flowFrom = flowStart + 1;
+
+        if (configurator.flowstop.length > 0) {
+            flowTo = configurator.flowstop.shift() + 1;
+        } else {
+            flowTo = basic_nodes.length;
+        }
+
+        var flowName = basic_nodes[flowStart].name;
+
+        for (var j = flowFrom; j < flowTo; j++) {
+            basic_nodes[j].link = basic_nodes[j].link.concat([flowName]);
+            flowName = basic_nodes[j].name;
+        }
+    });
+
+
+    function isMm(pos) { return configurator.mm.indexOf(parseInt(pos)) !== -1; }
+    function isMmStop(pos) { return configurator.mmstop.indexOf(parseInt(pos)) !== -1; }
+    function addLinkToPos(pos, link) { basic_nodes[pos].link = basic_nodes[pos].link.concat(link); }
+
+    var depth = 0;
+    var name_on_level = [];
+    var capture = false;
+    for (i in basic_nodes) {
+        if (capture) {
+            addLinkToPos(i, [name_on_level[depth]]);
+
+            if (isMm(i)) {
+                depth++;
+                name_on_level[depth] = basic_nodes[i].name;
+            }
+        }
+
+        if (isMm(i) && !capture) {
+            capture = true;
+            depth++;
+            name_on_level[depth] = basic_nodes[i].name;
+        }
+
+        if (isMmStop(i)) {
+            depth--;
+            if (depth < 0) {console.error('Wrong with something?');}
+        }
+    }
+
+    return basic_nodes;
 }
 
 if (module) {

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>MindWeb</title>
+    <style>
+        body {
+            font-family : 'Cantarell', 'Helvetica', 'Sans-serif';
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family : 'Aileron UltraLight';
+        }
+
+        #input-content {
+            width : 300px;
+            height : 300px;
+            opacity : 0.1;
+            position : fixed;
+            bottom : 150px;
+            right : 0;
+        }
+
+        #input-settings {
+            width : 300px;
+            height : 150px;
+            opacity : 0.1;
+            position : fixed;
+            bottom : 450px;
+            right : 0;
+        }
+
+        #input-md {
+            width : 300px;
+            height : 150px;
+            opacity : 0.1;
+            position : fixed;
+            bottom : 0;
+            right : 0;
+        }
+
+        #input-settings:focus, #input-content:focus, #input-md:focus {
+            opacity : 0.5;
+        }
+
+        #input-settings:hover, #input-content:hover, #input-md:hover {
+            opacity : 0.8 !important;
+        }
+
+        #vis, #text {
+            position : absolute;
+            top : 0;
+            left : 0;
+        }
+
+
+    </style>
+</head>
+<body id="Hallo" onload="">
+    <textarea id="input-settings"></textarea>
+    <textarea id="input-content"></textarea>
+    <textarea id="input-md"></textarea>
+    <div id="vis"></div>
+    <div id="text"></div>
+    
+    <script src="./lib/d3/d3.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./lib/markdown/markdown.js"></script>
+    <script src="./src/textProcessor.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./src/Painter.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+        var painter = new Painter('#vis');
+        var inputContent = document.getElementById('input-content');
+        var inputSettings = document.getElementById('input-settings');
+        var inputMd = document.getElementById('input-md');
+        var mdText = document.getElementById('text');
+
+        function processInput() {
+            painter.draw(textProcessor(inputContent.value));
+        };
+
+        inputContent.onkeydown = function(e) {
+            if (e.keyCode == 13) {
+                processInput();
+            }
+        };
+
+        inputContent.onchange = processInput;
+
+        inputSettings.onchange = function(e) {
+            painter.setOptions(e.currentTarget.value);
+            painter.init('#vis');
+            processInput();
+        };
+
+        inputMd.oninput = function(e) {
+            mdText.innerHTML = markdown.toHTML(e.currentTarget.value)
+        }
+
+        if (inputSettings.value === '') {
+            inputSettings.value = painter.getOptions();
+        }
+
+    </script>
+</body>
+</html>
