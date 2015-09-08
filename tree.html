@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>tree</title>
+    
+</head>
+<body id="Hallo" onload="">
+    
+    <script>
+
+mm = [1,3,6];
+mmstop = [5,8,10];
+
+tree = [];
+depth = 0;
+siblings_id = [0];
+capture = false;
+
+function isMm(pos) { return mm.indexOf(pos) !== -1; }
+function isMmStop(pos) { return mmstop.indexOf(pos) !== -1; }
+
+for (var i = 0; i < 12; i++) {
+    console.log([i, depth, siblings_id[depth]]);
+    if (capture) {
+
+        if (!Array.isArray(tree[depth])) { tree[depth] = []; }
+
+        if (!Array.isArray(tree[depth][siblings_id[depth]])) { tree[depth][siblings_id[depth]] = []; }
+
+        tree[depth][siblings_id[depth]].push(i);
+
+        if (isMm(i)) {
+            depth++
+            if (typeof tree[depth] == "undefined") { tree[depth] = []; }
+            if (typeof siblings_id[depth] == "undefined") { siblings_id[depth] = -1; }
+            siblings_id[depth] += 1;
+            tree[depth][siblings_id[depth]] = []
+        }
+    }
+
+    if (isMm(i) && !capture) {capture = true;}
+
+    if (isMmStop(i)) {
+        depth--;
+        if (depth < 0) {break;}
+    }
+}
+
+console.log(tree);
+
+    </script>
+</body>
+</html>

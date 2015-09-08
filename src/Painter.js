@@ -168,7 +168,7 @@ function Painter(divid) {
             ctx.fillRect(x, y, boxWidth, boxHeight );
 
             ctx.fillStyle = color;
-            ctx.fillText(datum.name, x+boxWidth/2, y+boxHeight/2);
+            ctx.fillText(String.trim(datum.name), x+boxWidth/2, y+boxHeight/2);
 
             // draw line
             ctx.strokeStyle = colorBox;

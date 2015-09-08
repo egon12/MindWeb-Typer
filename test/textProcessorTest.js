@@ -60,6 +60,16 @@ var expected = [
 ];
 assert.nodesEquals(textProcessor('Flow 1|flow\nFlow 2\nFlow 3\nFlow 4|flowstop\nFlow 5\nFlow 6|flow\nFlow 7\nFlow 8|flowstop\nFlow 9|flow\nFlow 10'), expected);
 
+
+/** test mm indent **/
+var expected = [
+    {name : 'Parent', x : 0, y : 0, color : 'steelblue', link: [] },
+    {name : 'Child 1 ', x : 0, y : 1, color : 'steelblue', link: ['Parent'] },
+    {name : 'Child 2', x : 0, y : 2, color : 'steelblue', link: ['Parent'] },
+];
+assert.nodesEquals(textProcessor('Parent\n, Child 1\n Child 2\n'), expected);
+
+
 /** test link */
 var expected = [
     {name : 'Link 1', x : 0, y : 0, color : 'steelblue', link: [] },

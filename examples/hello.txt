@@ -1,0 +1,42 @@
+Office
+ Money;-2;1
+  3C|green
+   Choose;-3;3
+   Chase;right
+   Customer
+  Funding;-3;1|red
+   Crowd;-4;0
+   Corp;below
+   Friend
+
+
+ Production;2;1
+  HR;below
+
+ Fact;2;0|red;
+  Large Expense;3;-1
+   undocumented;right
+  No Target;below
+  Less time
+
+ Achievment;0;-1|blue
+  Hendra;-1;-2
+  Balikpapan;right
+  Arif
+
+
+
+======================== Options
+{
+  "width": 1050,
+  "height": 600,
+  "boxSize": {
+    "width": 110,
+    "height": 50
+  },
+  "font": {
+    "size": 14,
+    "family": "Cantarell"
+  }
+}
+
