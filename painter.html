@@ -65,19 +65,17 @@
     
     <script src="./lib/d3/d3.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="./lib/markdown/markdown.js"></script>
-    <script src="./lib/jquery/jquery.min.js"></script>
-    <script src="./src/validator.js"></script>
     <script src="./src/textProcessor.js" type="text/javascript" charset="utf-8"></script>
     <script src="./src/painter.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript" charset="utf-8">
-        var painter = new MindWebPainter('#vis');
+        var painter = new painter('#vis');
         var inputContent = document.getElementById('input-content');
         var inputSettings = document.getElementById('input-settings');
         var inputMd = document.getElementById('input-md');
         var mdText = document.getElementById('text');
 
         function processInput() {
-            painter.draw(textProcessor(inputContent.value));
+            painter.draw(JSON.parse(inputContent.value));
         };
 
         inputContent.onkeydown = function(e) {
@@ -99,7 +97,7 @@
         }
 
         if (inputSettings.value === '') {
-            //inputSettings.value = painter.getOptions();
+            inputSettings.value = painter.getOptions();
         }
 
     </script>

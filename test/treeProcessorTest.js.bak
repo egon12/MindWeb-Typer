@@ -1,0 +1,177 @@
+describe('Tree Processor', function() {
+
+    it('Should able to tell the parents', function() {
+        var tp = new treeProcessor();
+        var source = {
+            name : 'parent',
+            options : {
+                'choices_1' : { 
+                    name : 'child1',
+                    options : {
+                        'choices_a' : { 
+                            name : 'child1_of_child1',
+                            options: {
+                                'option_c' : {name : 'child1_of_child1_of_child1'},
+                                'option_d' : {name : 'child2_of_child1_of_child1'},
+                            }
+                        },
+                        'choices_b' : { name : 'child2_of_child1' },
+                        'choices_c' : { 
+                            name : 'child3_of_child1',
+                            options : {
+                                'option_a' : { name : 'child1_of_child3_of_child1' },
+                                'option_b' : { name : 'child2_of_child3_of_child1' }
+                            }
+                        }
+                    }
+                },
+                'chouces_2' : { name : 'child2' }
+            }
+        };
+
+        var expected = [
+        { name : 'parent', link : [], y : 0, x : 1.5},
+        { name : 'child1', link : ['parent'], y : 1, x : 1.5},
+        { name : 'child2', link : ['parent'], y : 1, x : 3},
+        { name : 'child1_of_child1', link : ['child1'], y : 2, x : 0.5},
+        { name : 'child2_of_child1', link : ['child1'], y : 2, x : 1.5},
+        { name : 'child3_of_child1', link : ['child1'], y : 2, x : 2.5},
+        { name : 'child1_of_child1_of_child1', link : ['child1_of_child1'], y : 3, x : 0},
+        { name : 'child2_of_child1_of_child1', link : ['child1_of_child1'], y : 3, x : 1},
+        { name : 'child1_of_child3_of_child1', link : ['child3_of_child1'], y : 3, x : 2},
+        { name : 'child2_of_child3_of_child1', link : ['child3_of_child1'], y : 3, x : 3},
+        ];
+
+        tp.setRootNode(source);
+        var result = tp.createNodes();
+
+        //expect(result.length).toBe(expected.length);
+
+        for (var i=0; i<10; i++) {
+            //expect(result[i]).toEqual(expected[i]);
+        }
+
+        //expect(result).toEqual(expected);
+
+    });
+
+    it('Should able to group by level (test_1)', function() {
+
+        var tp = new treeProcessor();
+        var source = {
+            name : 'parent',
+            options : {
+                'choices_1' : { 
+                    name : 'child1',
+                    options : {
+                        'choices_a' : { 
+                            name : 'child1_of_child1',
+                            options: {
+                                'option_c' : {name : 'child1_of_child1_of_child1'},
+                                'option_d' : {name : 'child2_of_child1_of_child1'},
+                            }
+                        },
+                        'choices_b' : { name : 'child2_of_child1' },
+                        'choices_c' : { 
+                            name : 'child3_of_child1',
+                            options : {
+                                'option_a' : { name : 'child1_of_child3_of_child1' },
+                                'option_b' : { name : 'child2_of_child3_of_child1' }
+                            }
+                        }
+                    }
+                },
+                'chouces_2' : { name : 'child2' }
+            }
+        };
+        tp.setRootNode(source);
+        var expected = {
+            'level_0' : ['parent'],
+            'level_1' : ['child1', 'child2'],
+            'level_2' : ['child1_of_child1', 'child2_of_child1', 'child3_of_child1'],
+            'level_3' : [
+                'child1_of_child1_of_child1',
+                'child2_of_child1_of_child1',
+                'child1_of_child3_of_child1', 
+                'child2_of_child3_of_child1'
+            ],
+        };
+        var result = tp.getChildrenGroupByLevel();
+        expect(result.level_0).toEqual(expected.level_0);
+        expect(result.level_1).toEqual(expected.level_1);
+        expect(result.level_2).toEqual(expected.level_2);
+        expect(result.level_3).toEqual(expected.level_3);
+        expect(result).toEqual(expected);
+    });
+
+    it('Should able get all nodes name', function() {
+
+        var tp = new treeProcessor();
+        var source = {
+            name : 'parent',
+            options : {
+                'choices_1' : { name : 'child1' },
+                'chouces_2' : { name : 'child2' }
+            }
+        };
+
+        tp.setRootNode(source);
+        expect(tp.getAllNodesName()).toEqual(['parent', 'child1', 'child2']);
+
+        tp = new treeProcessor();
+        source = {
+            name : 'parent',
+            options : {
+                'choices_1' : { 
+                    name : 'child1',
+                    options : {
+                        'choices_1' : { name : 'child1_of_child1' },
+                        'choices_2' : { name : 'child2_of_child1' },
+                        'choices_3' : { 
+                            name : 'child3_of_child1',
+                            options : {
+                                'option_a' : { name : 'child1_of_child3_of_child1' },
+                                'option_b' : { name : 'child2_of_child3_of_child1' }
+                            }
+                        }
+                    }
+                },
+                'chouces_2' : { name : 'child2' }
+            }
+        };
+
+        tp.setRootNode(source);
+        expect(tp.getAllNodesName()).toEqual([
+                'parent', 
+                'child1', 
+                'child1_of_child1', 
+                'child2_of_child1', 
+                'child3_of_child1', 
+                'child1_of_child3_of_child1', 
+                'child2_of_child3_of_child1', 
+                'child2'
+        ]);
+    });
+
+    /*
+    it('Should change tree into position 1', function() {
+
+        var expected = [
+        {name : 'parent', x : 0.5, y : 0, color : 'steelblue', link : []},
+        {name : 'child1', x : 0,   y : 1, color : 'steelblue', link : ['parent']},
+        {name : 'child2', x : 1,   y : 1, color : 'steelblue', link : ['parent']}
+        ];
+
+        var source = {
+            name : 'parent',
+            options : {
+                'choices_1' : { name : 'child1' },
+                'chouces_2' : { name : 'child2' }
+            }
+        };
+
+        expect(treeProcessor(source)).toEqual(expected);
+    });
+
+    */
+});

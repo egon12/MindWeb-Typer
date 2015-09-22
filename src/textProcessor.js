@@ -94,6 +94,7 @@ function textProcessor(inputString) {
 
         /* set Name Position and Link */
         var namePositionLink = getNamePositionLink(s[0], pos);
+        node.id = namePositionLink[0];
         node.name = namePositionLink[0];
         node.x = namePositionLink[1];
         node.y = namePositionLink[2];
@@ -192,8 +193,4 @@ function textProcessor(inputString) {
     }
 
     return basic_nodes;
-}
-
-if (module) {
-    module.exports = textProcessor;
 }
