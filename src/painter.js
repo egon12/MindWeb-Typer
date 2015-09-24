@@ -133,7 +133,6 @@ var MindWebPainter = function(container_id, config_parameter) {
             .duration(600)
             .attr('fill', 'white')
             .remove();
-
     }
 
     /**
@@ -288,6 +287,11 @@ var MindWebPainter = function(container_id, config_parameter) {
             var side = d.side[fromto];
             var config = that.getConfig().rect;
 
+            // initialized if not exist
+            if (d.conn === undefined) { d.conn = {}; }
+            if (d.conn[fromto] === undefined) { d.conn[fromto] = {}; }
+
+            // count
             modifier = 0;
             if (xy == 'x') {
                 if (side == 'top' || side == 'bottom') { modifier = config.width / 2; } 
@@ -296,8 +300,8 @@ var MindWebPainter = function(container_id, config_parameter) {
                 if (side == 'left' || side == 'right') { modifier = config.height / 2; } 
                 else if ( side == 'bottom' ) { modifier = config.height; }
             }
-            d[fromto]['conn_' + xy] = scale[xy](d[fromto][xy]) + modifier;
-            return d[fromto]['conn_' + xy];
+            d.conn[fromto][xy] = scale[xy](d[fromto][xy]) + modifier;
+            return d.conn[fromto][xy];
         };
     }
 
@@ -318,7 +322,7 @@ var MindWebPainter = function(container_id, config_parameter) {
                 if (xy == 'x') { b = fromto_a; }
             }
 
-            return d[b]['conn_' + xy];
+            return d.conn[b][xy];
         };
 
     }
