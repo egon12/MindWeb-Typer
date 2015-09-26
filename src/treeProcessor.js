@@ -75,7 +75,7 @@ function treeProcessor(jsonSource) {
 
         this.rootNode._startX = 0;
 
-        this.getChildrenRecursive(this.rootNode, function(node, level, index, nodeParent) {
+        this.getChildrenRecursive(this.rootNode, function(node, level, index, option_name, nodeParent) {
             node._startX = nodeParent._startX + this.levelWidth['level_' + level] * index;
         });
     };
@@ -86,6 +86,7 @@ function treeProcessor(jsonSource) {
         var nodes = [];
 
         nodes.push({
+            id : this.rootNode[nodesName],
             name : this.rootNode[nodesName],
             link : [],
             y    : 0,
@@ -93,15 +94,18 @@ function treeProcessor(jsonSource) {
             color : 'steelblue'
         });
 
-        function createChildrenNode(node, level, index, nodeParent) {
+        function createChildrenNode(node, level, index, option_name, nodeParent) {
 
             var levelName = 'level_' + level;
             var levelWidth = this.levelWidth[levelName];
 
             nodes.push({
+                id : node[nodesName],
                 name : node[nodesName],
                 color : 'steelblue',
-                link : [nodeParent[nodesName]],
+                link : [
+                { id:nodeParent[nodesName], text:option_name}
+                ],
                 y    : level * 10,
                 x    : nodeParent._startX + levelWidth*index + (levelWidth+1) /2
             });
@@ -126,7 +130,7 @@ function treeProcessor(jsonSource) {
 
         var index = 0;
         for (var option in node[childNodesName]) {
-            callback(node[childNodesName][option], level, index, node);
+            callback(node[childNodesName][option], level, index, option, node);
             index += 1;
             this.getChildrenRecursive(node[childNodesName][option], callback, level + 1);
         }

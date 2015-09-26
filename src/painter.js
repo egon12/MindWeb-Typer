@@ -158,6 +158,7 @@ var MindWebPainter = function(container_id, config_parameter) {
             .attr('y2', get_connection_position_function_bezier('from', 'y'))
             .attr('x3', get_connection_position_function_bezier('to', 'x'))
             .attr('y3', get_connection_position_function_bezier('to', 'y'))
+            .attr('text', function(d, i) { return d.text; })
             .attr('stroke', function(d, i) { return d.stroke; });
 
         lines.enter()
@@ -170,6 +171,7 @@ var MindWebPainter = function(container_id, config_parameter) {
             .attr('y2', get_connection_position_function_bezier('from', 'y'))
             .attr('x3', get_connection_position_function_bezier('to', 'x'))
             .attr('y3', get_connection_position_function_bezier('to', 'y'))
+            .attr('text', function(d, i) { return d.text; })
             .attr('stroke', 'white')
             .transition()
             .duration(600)
@@ -391,20 +393,25 @@ var MindWebPainter = function(container_id, config_parameter) {
 
             var el = d3.select(this);
 
-            var x1 = el.attr('x1');
-            var y1 = el.attr('y1');
-            var x2 = el.attr('x2');
-            var y2 = el.attr('y2');
-            var x3 = el.attr('x3');
-            var y3 = el.attr('y3');
-            var x4 = el.attr('x4');
-            var y4 = el.attr('y4');
+            var x1 = parseInt(el.attr('x1'));
+            var y1 = parseInt(el.attr('y1'));
+            var x2 = parseInt(el.attr('x2'));
+            var y2 = parseInt(el.attr('y2'));
+            var x3 = parseInt(el.attr('x3'));
+            var y3 = parseInt(el.attr('y3'));
+            var x4 = parseInt(el.attr('x4'));
+            var y4 = parseInt(el.attr('y4'));
 
             ctx.strokeStyle = d.stroke;
             ctx.beginPath();
             ctx.moveTo(x1, y1);
             ctx.bezierCurveTo(x2, y2, x3, y3, x4, y4);
             ctx.stroke();
+
+            if (el.attr('text') !== '') {
+                ctx.fillStyle = 'black';
+                ctx.fillText(el.attr('text'), x1 + ((x4-x1)/2), y1 + ((y4-y1)/2) - config.font.size );
+            }
         });
 
     };
