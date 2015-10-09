@@ -28,7 +28,7 @@ var MindWebPainter = function(container_id, config_parameter) {
         },
         font : {
             family : "Cantarell",
-            size : 16
+            size : 14
         }
     };
 
@@ -381,7 +381,13 @@ var MindWebPainter = function(container_id, config_parameter) {
             ctx.fillRect(x, y, config.rect.width, config.rect.height);
 
             ctx.fillStyle = el.attr('color');
-            ctx.fillText(d.id.trim(), x + config.rect.width/2, y + config.rect.height/2);
+            var text;
+            if (d.name !== undefined && d.name !== '') {
+                text = d.name.trim();
+            } else {
+                text = d.id.trim();
+            }
+            ctx.fillText(text, x + config.rect.width/2, y + config.rect.height/2);
 
             //this.drawLink(d, rects);
         });
@@ -413,7 +419,6 @@ var MindWebPainter = function(container_id, config_parameter) {
                 ctx.fillText(el.attr('text'), x1 + ((x4-x1)/2), y1 + ((y4-y1)/2) - config.font.size );
             }
         });
-
     };
 
 
