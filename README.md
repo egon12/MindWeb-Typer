@@ -21,9 +21,9 @@ And you can see it will create three box with the name.
 ###Set The Position
 And how set the position? Go ahead and type
 
-    one,0,0
-    two,1,1
-    three,2,2
+    one;0;0
+    two;1;1
+    three;2;2
 
 And it will create diagonal box. Basicly the second and the third variable
 are position in space. You don't have to heavily think of the coordinate. 
@@ -36,15 +36,15 @@ This program will calculate the real coordinate for you. Just think like node
 Now what if we want to connect the node? It easy just add the node name after the
 third variable Like
 
-    one,0,0,two,three
-    two,1,1
-    three,2,2
+    one;0;0,two,three
+    two;1;1
+    three;2;2
 
 Or if not using the coordinate you can type the node name next to the name like
 
-    one,two,three
-    two,1,1
-    three,0,1
+    one;two;three
+    two;1;1
+    three;0;1
 
 If you see this, there will be a problem is the node are not unique. So make sure
 the node make sure the node are unique
