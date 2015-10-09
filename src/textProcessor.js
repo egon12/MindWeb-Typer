@@ -21,13 +21,14 @@ function textProcessor(inputString) {
         mmstop : []
     };
 
-    function getNamePositionLink(s, pos) {
+    function getBasicVar(s, pos) {
 
-        var name, x, y, link;
+        var id, name, x, y, link;
         var a = s.split(";");
 
+        // todo seperate id and name
         // name
-        name = a.shift();
+        id = name = a.shift();
         // x
         if (!isNaN(a[0])) { 
             x = a.shift(); 
@@ -35,12 +36,13 @@ function textProcessor(inputString) {
             if (!isNaN(a[0])) { 
                 y = a.shift(); 
             }
-        } else if (['hor', 'ver', 'right', 'left', 'top', 'down', 'above', 'below'].indexOf(a[0]) !== -1) {
-            configurator.nextPosition[pos] = a.shift();
         } 
-        if (x === undefined && pos === 0) { x = 0; y = 0; }
+        // link
         link = a;
-        return [name, x, y, link];
+
+        if (x === undefined && pos === 0) { x = 0; y = 0; }
+
+        return { id : id, name : name, x : x, y : y, link : link };
     }
 
     function getColor(s) {
@@ -84,24 +86,15 @@ function textProcessor(inputString) {
     }
 
 
-
+    /** Ok the real Code */
     var basic_nodes = inputString.split("\n").filter(function(s,i) { return s !== '';});
     basic_nodes = basic_nodes.map(function(s, pos) {
 
+        // first prepare the string first for basic node else for config
         s = s.split('|');
 
-        var node = {};
-
-        /* set Name Position and Link */
-        var namePositionLink = getNamePositionLink(s[0], pos);
-        node.id = namePositionLink[0];
-        node.name = namePositionLink[0];
-        node.x = namePositionLink[1];
-        node.y = namePositionLink[2];
-        if (node.link === undefined) {
-            node.link = [];
-        }
-        node.link = node.link.concat(namePositionLink[3]);
+        // getBasicVar (id, name, x, y and link
+        var node = getBasicVar(s[0], pos);
 
         /* set Color and modify link by tempSetting */
         // default color

@@ -80,6 +80,7 @@ function treeProcessor(jsonSource) {
         });
     };
 
+    var result_index = 0;
     this.createNodes = function() {
 
         // prepare first
@@ -98,16 +99,24 @@ function treeProcessor(jsonSource) {
 
             var levelName = 'level_' + level;
             var levelWidth = this.levelWidth[levelName];
+            var id, name, color;
+
+            color = 'steelblue';
+            if (node.type == 'result') {
+                id = 'result' + result_index++;
+                name = node.value;
+            } else {
+                id = node[nodesName];
+                name = node[nodesName];
+            }
 
             nodes.push({
-                id : node[nodesName],
-                name : node[nodesName],
-                color : 'steelblue',
-                link : [
-                { id:nodeParent[nodesName], text:option_name}
-                ],
+                id : id,
+                name : name,
+                color : color,
+                link : [ { id:nodeParent[nodesName], text:option_name} ],
                 y    : level * 10,
-                x    : nodeParent._startX + levelWidth*index + (levelWidth+1) /2
+                x    : nodeParent._startX + levelWidth*index + (levelWidth+1)/2
             });
         }
 
