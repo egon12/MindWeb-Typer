@@ -74,10 +74,10 @@ describe("Painter Test", function() {
 
         // check one first
         expect(connections).toEqual([
-            { from : data[0], to : data[1], text : '', color : 'steelblue', side : { from : 'right',  to : 'left'  }},
-            { from : data[0], to : data[2], text : '', color : 'steelblue', side : { from : 'bottom', to : 'top'    }},
-            { from : data[0], to : data[3], text : '', color : 'steelblue', side : { from : 'bottom', to : 'top'  }},
-            { from : data[3], to : data[2], text : '', color : 'steelblue', side : { from : 'left',   to : 'right' }}
+            { from : data[0], to : data[1], text : '', stroke : 'steelblue', side : { from : 'right',  to : 'left'  }},
+            { from : data[0], to : data[2], text : '', stroke : 'steelblue', side : { from : 'bottom', to : 'top'    }},
+            { from : data[0], to : data[3], text : '', stroke : 'steelblue', side : { from : 'bottom', to : 'top'  }},
+            { from : data[3], to : data[2], text : '', stroke : 'steelblue', side : { from : 'left',   to : 'right' }}
         ]);
     });
 
@@ -110,7 +110,6 @@ describe("Painter Test", function() {
             if (index === undefined) {
                 return getSvg().selectAll('rect')[0]; 
             }
-
             return d3.select(getSvg().selectAll('rect')[0][index]);
         }
 
@@ -118,9 +117,7 @@ describe("Painter Test", function() {
             if (index === undefined) {
                 return getSvg().selectAll('line')[0]; 
             }
-
             return d3.select(getSvg().selectAll('line')[0][index]);
-
         }
 
         it('should able draw 4 rect', function() {
@@ -154,7 +151,7 @@ describe("Painter Test", function() {
             expect(getLine().length).toBe(4);
         });
 
-        it('should draw the posiiton(x,y) of the lines right', function() {
+        it('should draw the position(x,y) of the lines right', function() {
             expect(getLine(0).attr('x1')).toBe('100');
             expect(getLine(0).attr('y1')).toBe('20');
             expect(getLine(0).attr('x2')).toBe('300');
@@ -164,14 +161,6 @@ describe("Painter Test", function() {
             expect(getLine(0).attr('x4')).toBe('300');
             expect(getLine(0).attr('y4')).toBe('20');
 
-            expect(getLine(2).attr('x1')).toBe('100');
-            expect(getLine(2).attr('y1')).toBe('20');
-            expect(getLine(2).attr('x2')).toBe('300');
-            expect(getLine(2).attr('y2')).toBe('20');
-            expect(getLine(2).attr('x3')).toBe('100');
-            expect(getLine(2).attr('y3')).toBe('20');
-            expect(getLine(2).attr('x4')).toBe('350');
-            expect(getLine(2).attr('y4')).toBe('160');
 
             /*
             expect(getLine(1).attr('x')).toBe('300');
@@ -185,7 +174,15 @@ describe("Painter Test", function() {
             */
         });
 
-
+        it('should choose bottom up line over the left right line', function() {
+            expect(getLine(2).attr('x1')).toBe('50');
+            expect(getLine(2).attr('y1')).toBe('40');
+            expect(getLine(2).attr('x2')).toBe('50');
+            expect(getLine(2).attr('y2')).toBe('160');
+            expect(getLine(2).attr('x3')).toBe('350');
+            expect(getLine(2).attr('y3')).toBe('40');
+            expect(getLine(2).attr('x4')).toBe('350');
+            expect(getLine(2).attr('y4')).toBe('160');
+        });
     });
-
 });
