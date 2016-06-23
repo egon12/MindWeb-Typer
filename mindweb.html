@@ -27,33 +27,34 @@
         #input-content {
             width : 300px;
             height : 300px;
-            /*opacity : 0.1;*/
+            opacity : 0.1;
             position : fixed;
-            bottom : 150px;
+            bottom : 127px;
             right : 0;
         }
 
         #input-type {
             width : 300px;
             height : 26px;
+            opacity : 0.1; 
             position : fixed;
-            bottom : 123px;
+            bottom : 100px;
             right : 0;
         }
 
         #input-config {
             width : 300px;
             height : 150px;
-            /*opacity : 0.1; */
+            opacity : 0.1; 
             position : fixed;
-            bottom : 451px;
+            bottom : 428px;
             right : 0;
         }
 
         #input-md {
             width : 300px;
             height : 100px;
-            /*opacity : 0.1;*/
+            opacity : 0.1;
             position : fixed;
             bottom : 0;
             right : 0;
@@ -63,7 +64,7 @@
             opacity : 0.5;
         }
 
-        #input-config:hover, #input-content:hover, #input-type:focus, #input-md:hover {
+        #input-config:hover, #input-content:hover, #input-type:hover, #input-md:hover {
             opacity : 0.8 !important;
         }
 
@@ -77,6 +78,7 @@
     </style>
 </head>
 <body id="Hallo" onload="">
+    <div id="vis"></div>
     <textarea id="input-config"></textarea>
     <textarea id="input-content"></textarea>
     <fieldset id="input-type">
@@ -86,8 +88,7 @@
         <label>Flow      <input type="radio" name="input-type" value="flow"></label>
     </fieldset>
     <textarea id="input-md"></textarea>
-    <div id="vis"></div>
-    <div id="text"></div>
+    <!-- <div id="text"></div> -->
     
     <script src="./lib/d3/d3.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="./lib/markdown/markdown.js"></script>
@@ -95,13 +96,14 @@
     <script src="./src/validator.js"></script>
     <script src="./src/textProcessor.js" type="text/javascript" charset="utf-8"></script>
     <script src="./src/treeProcessor.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./src/flowProcessor.js" type="text/javascript" charset="utf-8"></script>
     <script src="./src/painter.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript" charset="utf-8">
         var painter = new MindWebPainter('#vis');
         var inputContent = document.getElementById('input-content');
         var inputConfig = document.getElementById('input-config');
         var inputMd = document.getElementById('input-md');
-        var mdText = document.getElementById('text');
+        // var mdText = document.getElementById('text');
 
         function processInput() {
             var type = $('input[name="input-type"]:checked').val();
@@ -114,8 +116,10 @@
                     content = JSON.parse(inputContent.value);
                     break;
                 case 'jsontree':
-                    console.log(inputContent.value);
                     content = treeProcessor(JSON.parse(inputContent.value));
+                    break;
+                case 'flow':
+                    content = flowProcessor(inputContent.value, painter.getConfig());
                     break;
             }
             inputMd.value = JSON.stringify(content, undefined, 2);
