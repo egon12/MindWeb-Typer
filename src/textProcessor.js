@@ -193,6 +193,8 @@ function textProcessor(inputString) {
     return basic_nodes;
 }
 
-if (module) {
+/*
+if (module === undefined) {
     module.exports = textProcessor;
 }
+*/

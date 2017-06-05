@@ -31,20 +31,12 @@ function Painter(divid) {
         d3.timer(drawCanvas);
     }
 
-    function getNodeX(d, i) {
-        return parseInt(d.x);
-    }
-
-    function getNodeY(d, i) {
-        return parseInt(d.y);
-    }
-
     function getScale(nodes) {
 
-        var minX = d3.min(nodes, getNodeX);
-        var maxX = d3.max(nodes, getNodeX);
-        var minY = d3.min(nodes, getNodeY);
-        var maxY = d3.max(nodes, getNodeY);
+        var minX = d3.min(nodes, function(d) { return parseInt(d.x); });
+        var maxX = d3.max(nodes, function(d) { return parseInt(d.x); });
+        var minY = d3.min(nodes, function(d) { return parseInt(d.y); });
+        var maxY = d3.max(nodes, function(d) { return parseInt(d.y); });
 
         if (minX == maxX) {
             minX -= 1;
@@ -108,7 +100,6 @@ function Painter(divid) {
                 y : addY2 
             }
         };
-
     }
 
     this.draw = function(data) {
@@ -168,7 +159,7 @@ function Painter(divid) {
             ctx.fillRect(x, y, boxWidth, boxHeight );
 
             ctx.fillStyle = color;
-            ctx.fillText(String.trim(datum.name), x+boxWidth/2, y+boxHeight/2);
+            ctx.fillText(datum.name.trim(), x+boxWidth/2, y+boxHeight/2);
 
             // draw line
             ctx.strokeStyle = colorBox;
