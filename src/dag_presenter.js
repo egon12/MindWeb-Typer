@@ -4,23 +4,39 @@ import SVGPainter from './svg_painter'
 
 const config = {
     container: { id: '#container', width: 400, height: 300 },
-    rect: { width: 100, height: 80 },
-    font: { family: 'Cantarell', size: 14 }
+    rect: { width: 100, height: 40 },
+    font: { family: 'Helvetica', size: 14 }
 }
 
 const dag = new DAG()
 
 const position = new PositionCalculator()
 
+let painter;
+
 global.dagonload = function() {
-    const painter = new SVGPainter(config)
-    draw()
+    painter = new SVGPainter(config)
+    mydraw("")
 }
 
-global.draw = function(content) {
-    const data = dag.process("A\nB\nC")
-    const nodes = position.calculateNodePosition(data, config)
-    painter.drawNodes(nodes, config)
+global.mydraw = function(content) {
+    try {
+        const data = dag.process(content)
+        const nodes = position.calculateNodePosition(data, config)
+
+        const edges = position.calculateEdgePoints(nodes, config)
+
+        painter.drawEdges(edges)
+
+        painter.drawNodes(nodes, config)
+
+
+    } catch (e) {
+        global.alert(e)
+
+    }
 }
+
+console.log(global)
 
 dagonload()
