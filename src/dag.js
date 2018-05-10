@@ -1,5 +1,7 @@
 const MAX_LEVEL = 50
 
+const LEVEL_MUL = -10
+
 export default class DAG {
 
     convertToObj(c) {
@@ -33,7 +35,7 @@ export default class DAG {
     getLevel(level, done, notyet) {
         const newdone = notyet
             .filter(this.linkIsIn(done.map(i => i.id)))
-            .map(i => Object.assign({}, i, {y: -1 * level}))
+            .map(i => Object.assign({}, i, {y: LEVEL_MUL * level}))
             .concat(done)
         
         const newnotyet = notyet.filter(i => !newdone.map(i => i.id).includes(i.id))
@@ -62,9 +64,29 @@ export default class DAG {
 
 
     setXByLevel(data, maxLevel) {
-        for (let y=0; y > -1 * maxLevel; y--) {
+
+        for (let y=0; y > LEVEL_MUL * maxLevel; y += LEVEL_MUL) {
             data.filter(n => n.y == y).forEach( (d, i) => d.x = i )
         }
+
+        const countItemPerLevel = data.reduce( (a,n) => {
+            if (!a[n.y]) a[n.y] = 0
+            a[n.y] += 1
+            return a
+        }, {})
+
+        let maxItem = 0
+        for (let level in countItemPerLevel) {
+            if (maxItem < countItemPerLevel[level]) maxItem = countItemPerLevel[level]
+        }
+
+        let mulPerLevel = {}
+        for (let level in countItemPerLevel) {
+            mulPerLevel[level] = (maxItem + 1) / (countItemPerLevel[level] + 1)
+        }
+
+        data.forEach(n => n.x = (n.x + 1) * mulPerLevel[n.y])
+
         return data
     }
 
