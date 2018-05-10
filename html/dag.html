@@ -8,6 +8,20 @@
 <script src="../dist/dag.js"></script>
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script>
+var inputContent = document.querySelector('#input')
+
+function processInput() {
+    mydraw(inputContent.value)
+}
+
+inputContent.onkeydown = function(e) {
+    if (e.keyCode == 13) {
+        processInput();
+    }
+};
+
+
+inputContent.onchange = processInput;
 
 </script>
 </html>
