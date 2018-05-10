@@ -4,7 +4,8 @@ test('test svg_painter', () => {
 
     const config = { 
         container : { id: 'graph', width: 400, height: 300 },
-        rect: { width: 100, height: 80 }
+        rect: { width: 100, height: 80 },
+        font: { family: 'Helvetica', size: 14 }
     }
 
     const p = new SVGPainter(config)
@@ -13,7 +14,7 @@ test('test svg_painter', () => {
         { r_x: 200, r_y : 150, color: 'steelblue' }
     ]
 
-    p.drawNodes(nodes)
+    p.drawNodes(nodes, config)
 
 
 })

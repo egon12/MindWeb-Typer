@@ -5,18 +5,16 @@ export default class SVGPainter {
     constructor(config) {
 
         const cc = config.container
-        console.log(d3)
-        const base = d3.select('body')
-        console.log(base.append)
+        const base = d3.select(cc.id)
 
         base.selectAll('svg').remove()
 
         const graph = base.append('svg')
             .attr('width', cc.width)
             .attr('height', cc.height)
+            .style('border', '1px solid bold')
 
         this.graph = graph
-        console.log(this.graph)
 
     }
 
@@ -71,7 +69,7 @@ export default class SVGPainter {
             .attr('font-family', config.font.family)
             .attr('font-size', config.font.size)
             .attr('dominant-baseline', 'central')
-            .attr('text-alignment', 'center')
+            .attr('text-anchor', 'middle')
             .attr('x', d => d.r_x + config.rect.width / 2)
             .attr('y', d => d.r_y + config.rect.height / 2)
 
@@ -85,20 +83,22 @@ export default class SVGPainter {
 
 
     drawEdges(edges) {
-        const lines = this.graph.selectAll('path').data(edges)
+        const lines = this.graph.selectAll('path').data(edges, i => i.from.id + i.to.id)
 
-        lines.transition()
-            .duration(600)
-            .attr('stroke', c => c.stroke)
+        lines
+            .transition()
+            .duration(300)
             .attr('d', this.makeD)
 
         lines.enter()
             .append('path')
             .attr('stroke', 'white')
+            .attr('stroke-width', '10')
+            .attr('fill', 'none')
             .transition()
             .duration(600)
-            .attr('stroke', c => c.stroke)
             .attr('d', this.makeD)
+            .attr('stroke', c => c.stroke)
 
         lines.exit()
             .transition()
@@ -108,8 +108,9 @@ export default class SVGPainter {
 
     }
 
-    makeD(c) {
-        return ["M", c.x1, c.y2, "C", c.x2, c.y2, c.x3, c.y3, c.x4, cy4].join(' ')
+    makeD(connection) {
+        const c = connection.curve
+        return ["M", c.x1, c.y1, "C", c.x2, c.y2, c.x3, c.y3, c.x4, c.y4].map(i => isNaN(i) ? i : parseInt(i)).join(' ')
     }
 
 
