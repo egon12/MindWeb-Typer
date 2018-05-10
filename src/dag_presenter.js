@@ -32,6 +32,7 @@ global.mydraw = function(content) {
 
 
     } catch (e) {
+        console.error(e)
         global.alert(e)
 
     }
