@@ -118,6 +118,6 @@ test("create connection", () => {
     const ps = new PositionCalculator()
     const dataWithPosition = ps.calculateNodePosition(data, config)
     const edges = ps.calculateEdgePoints(dataWithPosition, config)
-    console.log(edges)
+    //console.log(edges)
 })
 

@@ -130,8 +130,32 @@ export default class PositionCalculator {
         var [x1, y1] = this.offset(side.from, from.r_x, from.r_y, config)
         var [x4, y4] = this.offset(side.to, to.r_x, to.r_y, config)
         var x2, y2, x3, y3
-        x2 = x3 = (x1+x4)/2
-        y2 = y3 = (y1+y4)/2
+
+        switch(side.from) {
+            case 'top': 
+            case 'bottom': 
+                x2 = x1
+                y2 = (y1 + y4)/2
+                break
+            case 'left': 
+            case 'right': 
+                y2 = y1
+                x2 = (x1+x4)/2
+                break
+        }
+
+        switch(side.to) {
+            case 'top': 
+            case 'bottom': 
+                x3 = x4
+                y3 = (y1 + y4)/2
+                break
+            case 'left': 
+            case 'right': 
+                y3 = y4
+                x3 = (x1+x4)/2
+                break
+        }
 
         return {x1, y1, x2, y2, x3, y3, x4, y4}
     }
