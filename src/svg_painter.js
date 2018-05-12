@@ -2,8 +2,7 @@ import * as d3 from 'd3'
 
 export default class SVGPainter {
 
-    constructor(config) {
-
+    init(config) {
         const cc = config.container
         const base = d3.select(cc.id)
 
@@ -15,13 +14,46 @@ export default class SVGPainter {
             .style('border', '1px solid bold')
 
         this.graph = graph
-
     }
 
     drawNodes(nodes, config) {
+        this.drawRects(nodes, config)
+        this.drawTexts(nodes, config)
+    }
 
+    drawEdges(edges, config) {
+        const lines = this.graph.selectAll('path').data(edges, i => i.from.id + i.to.id)
+
+        lines
+            .transition()
+            .duration(300)
+            .attr('d', this.makeD)
+
+        lines.enter()
+            .append('path')
+            .attr('stroke', 'white')
+            .attr('stroke-width', '10')
+            .attr('fill', 'none')
+            .attr('d', this.makeD)
+            .transition()
+            .duration(600)
+            .attr('stroke', c => c.stroke)
+
+        lines.exit()
+            .transition()
+            .duration(600)
+            .attr('stroke', 'white')
+            .remove();
+
+    }
+
+    makeD(connection) {
+        const c = connection.curve
+        return ["M", c.x1, c.y1, "C", c.x2, c.y2, c.x3, c.y3, c.x4, c.y4].map(i => isNaN(i) ? i : parseInt(i)).join(' ')
+    }
+
+    drawRects(nodes, config) {
         const rects = this.graph.selectAll('rect').data(nodes, i => i.id)
-
 
         rects.transition()
             .duration(600)
@@ -51,7 +83,9 @@ export default class SVGPainter {
             .attr('fill', 'white')
             .remove();
 
+    }
 
+    drawTexts(nodes, config) {
         const texts = this.graph.selectAll('text').data(nodes, i => i.id)
 
         texts
@@ -77,42 +111,5 @@ export default class SVGPainter {
             .transition()
             .duration(600)
             .remove();
-
-
     }
-
-
-    drawEdges(edges) {
-        const lines = this.graph.selectAll('path').data(edges, i => i.from.id + i.to.id)
-
-        lines
-            .transition()
-            .duration(300)
-            .attr('d', this.makeD)
-
-        lines.enter()
-            .append('path')
-            .attr('stroke', 'white')
-            .attr('stroke-width', '10')
-            .attr('fill', 'none')
-            .transition()
-            .duration(600)
-            .attr('d', this.makeD)
-            .attr('stroke', c => c.stroke)
-
-        lines.exit()
-            .transition()
-            .duration(600)
-            .attr('stroke', 'white')
-            .remove();
-
-    }
-
-    makeD(connection) {
-        const c = connection.curve
-        return ["M", c.x1, c.y1, "C", c.x2, c.y2, c.x3, c.y3, c.x4, c.y4].map(i => isNaN(i) ? i : parseInt(i)).join(' ')
-    }
-
-
-
 }
