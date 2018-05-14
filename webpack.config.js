@@ -1,15 +1,14 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/dag_presenter.js',
-  mode: 'development',
+  entry: {
+      'dag': ['./src/dag_presenter.js'],
+      'painter': ['./src/painter.new.js'],
+  },
+  mode: 'production',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'dag.js',
-    library: 'debug',
-    libraryTarget: 'var'
-
-
+    filename: '[name].js',
   }
 };
 
