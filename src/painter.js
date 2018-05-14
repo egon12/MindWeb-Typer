@@ -1,15 +1,11 @@
-/**
- * Class MinWebPainter 
- */
-var MindWebPainter = function(container_id, config_parameter) {
+import * as d3 from 'd3'
+
+export default function(container_id, config_parameter) {
 
     // check 
     var check_dependencies = function() {
         if (d3 === undefined) { throw "depend on d3js"; }
-        if ($ === undefined) { throw "depend on jQuery"; }
     }();
-
-    var validator = new Validator();
 
     /** Default config */
     if (container_id === '') {
@@ -37,7 +33,7 @@ var MindWebPainter = function(container_id, config_parameter) {
      * @param {object} config - config
      */
     this.setConfig = function(conf) {
-        config = $.extend(true, config, conf);
+        config = Object.assign({}, config, conf);
     };
 
     /**
@@ -352,10 +348,10 @@ var MindWebPainter = function(container_id, config_parameter) {
         repairSingle(yMinMax);
 
         return {
-            x : d3.scale.linear()
+            x : d3.scaleLinear()
                 .range([0, config.container.width - config.rect.width])
                 .domain(xMinMax),
-            y : d3.scale.linear()
+            y : d3.scaleLinear()
                 .range([0, config.container.height - config.rect.height])
                 .domain(yMinMax),
         };
