@@ -1,8 +1,9 @@
 import DAG from './dag'
 import PositionCalculator from './position_calculator'
 import SVGPainter from './svg_painter'
+import CanvasPainter from './canvas_painter'
 
-const config = {
+global.config = {
     container: { id: '#container', width: 400, height: 300 },
     rect: { width: 100, height: 40 },
     font: { family: 'Helvetica', size: 14 }
@@ -14,21 +15,21 @@ const position = new PositionCalculator()
 
 let painter;
 
-global.dagonload = function() {
-    painter = new SVGPainter(config)
-    mydraw("")
+global.graphInit = function() {
+    painter = new CanvasPainter()
+    painter.init(global.config)
 }
 
-global.mydraw = function(content) {
+global.graphDraw = function(content) {
     try {
         const data = dag.process(content)
         const nodes = position.calculateNodePosition(data, config)
 
         const edges = position.calculateEdgePoints(nodes, config)
 
-        painter.drawEdges(edges)
+        painter.drawEdges(edges, global.config)
 
-        painter.drawNodes(nodes, config)
+        painter.drawNodes(nodes, global.config)
 
 
     } catch (e) {
@@ -37,7 +38,3 @@ global.mydraw = function(content) {
 
     }
 }
-
-console.log(global)
-
-dagonload()
