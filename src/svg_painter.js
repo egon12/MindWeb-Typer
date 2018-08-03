@@ -1,10 +1,11 @@
-import * as d3 from 'd3-selection'
+import {select} from 'd3-selection'
+import _d3 from 'd3-transition'
 
 export default class SVGPainter {
 
     init(config) {
         const cc = config.container
-        const base = d3.select(cc.id)
+        const base = select(cc.id)
 
         base.selectAll('svg').remove()
 

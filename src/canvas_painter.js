@@ -1,4 +1,6 @@
-import * as d3 from 'd3'
+import {select} from 'd3-selection'
+
+import {timer} from 'd3-timer'
 
 import SVGPainter from './svg_painter.js'
 
@@ -6,7 +8,7 @@ export default class CanvasPainter extends SVGPainter{
 
     init(config) {
         const cc = config.container
-        const base = d3.select(cc.id)
+        const base = select(cc.id)
 
         base.selectAll('canvas').remove();
 
@@ -20,7 +22,7 @@ export default class CanvasPainter extends SVGPainter{
         this.ctx = this.canvas.node().getContext('2d')
 
         this.config = config
-        d3.timer(this.drawInCanvas.bind(this))
+        timer(this.drawInCanvas.bind(this))
 
     }
 
@@ -57,7 +59,7 @@ export default class CanvasPainter extends SVGPainter{
 
         rects.each(function(d, i) {
 
-            var el = d3.select(this);
+            var el = select(this);
 
             var x = Number(el.attr('x'));
             var y = Number(el.attr('y'));
@@ -86,7 +88,7 @@ export default class CanvasPainter extends SVGPainter{
         ctx.lineWidth = '4';
         paths.each(function(d, i) {
 
-            const el = d3.select(this)
+            const el = select(this)
 
             const pathDetail = el.attr('d')
 

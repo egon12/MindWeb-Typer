@@ -1,7 +1,6 @@
 import DAG from './dag'
 import PositionCalculator from './position_calculator'
 import SVGPainter from './svg_painter'
-import CanvasPainter from './canvas_painter'
 
 global.config = {
     container: { id: '#container', width: 400, height: 300 },
