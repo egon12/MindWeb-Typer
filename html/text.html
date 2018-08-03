@@ -60,46 +60,12 @@
 <textarea id="input-content"></textarea>
 <textarea id="input-md"></textarea>
 
-<script src="../dist/dag.js"></script>
-</script>
+<script src="../dist/text.js"></script>
 <script>
 var inputContent = document.querySelector('#input-content')
 var inputSettings = document.querySelector('#input-settings')
 
-function processInput() {
-    graphDraw(inputContent.value)
-}
-
-inputContent.onkeydown = function(e) {
-    if (e.keyCode == 13) {
-        processInput();
-    }
-};
-
-inputContent.onchange = processInput;
-
-if (inputSettings.value == "") {
-    inputSettings.value = JSON.stringify(config, null, 2)
-} else {
-    try {
-        config = JSON.parse(inputSettings.value)
-    } catch(e) {
-        alert(e)
-    }
-}
-
-inputSettings.onchange = function(e) {
-    try {
-        config = JSON.parse(inputSettings.value)
-        graphInit()
-        graphDraw(inputContent.value)
-    } catch(e) {
-        alert(e)
-    }
-}
-
-graphInit()
-
+initInput(inputContent, inputSettings)
 
 </script>
 </body>

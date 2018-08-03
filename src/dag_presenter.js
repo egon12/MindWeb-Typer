@@ -16,7 +16,7 @@ const position = new PositionCalculator()
 let painter;
 
 global.graphInit = function() {
-    painter = new CanvasPainter()
+    painter = new SVGPainter()
     painter.init(global.config)
 }
 
