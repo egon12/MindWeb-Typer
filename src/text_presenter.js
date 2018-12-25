@@ -78,6 +78,3 @@ global.initInput = function(inputContent, inputSettings) {
   graphInit()
 
 }
-
-
-

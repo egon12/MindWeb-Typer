@@ -6,7 +6,7 @@ export default function mindmapProcessor(inputString) {
 
   const tree = makeTree(words)
   
-  level1PosX = [-1, 1]
+  level1PosX = [-10, 10]
   makePosRecursive(tree, 0, tree)
 
   return makeTreeToFlat(tree)
@@ -72,24 +72,32 @@ function makePos(tree, level, root) {
   if (level == 0) {
     tree.x = 0;
     tree.y = 0;
+
+    const ang = Math.PI * 2 / tree.childs.length
+    for (let i=0; i<tree.childs.length; i++) {
+      const x = Math.cos(ang * i) * 10
+      const y = Math.sin(ang * i) * 10
+
+      tree.childs[i].x = x > 0 ? Math.floor(x) : Math.ceil(x)
+      tree.childs[i].y = y > 0 ? Math.floor(y) : Math.ceil(y)
+    }
+
     return
   }
 
-
   if (level == 1) {
-    tree.x = level1PosX.pop()
-    tree.y = 0
+    // already set when set pos at level 0
     return
   }
 
   const parent = findInTree(root, tree.parentId)
 
   if (parent.x > 0) {
-    tree.x = parent.x + 1
-    tree.y = parent.childs.indexOf(tree) - Math.floor(parent.childs.length / 2)
+    tree.x = parent.x + 10
+    tree.y = parent.y + parent.childs.indexOf(tree) - Math.floor(parent.childs.length / 2)
   } else {
-    tree.x = parent.x - 1
-    tree.y = parent.childs.indexOf(tree) - Math.floor(parent.childs.length / 2)
+    tree.x = parent.x - 10
+    tree.y = parent.y + parent.childs.indexOf(tree) - Math.floor(parent.childs.length / 2)
   }
 }
 

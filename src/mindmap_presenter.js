@@ -24,7 +24,6 @@ const graphInit = function() {
 const graphDraw = function(content) {
   try {
     const data = mindmap(content)
-    console.log(data)
 
     const nodes = position.calculateNodePosition(data, config)
 
@@ -38,7 +37,6 @@ const graphDraw = function(content) {
   } catch (e) {
     console.error(e)
     global.alert(e)
-
   }
 }
 
