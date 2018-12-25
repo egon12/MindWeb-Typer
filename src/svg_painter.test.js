@@ -1,6 +1,6 @@
 import SVGPainter from './svg_painter'
 
-test('test svg_painter', () => {
+test.skip('test svg_painter', () => {
 
     const config = { 
         container : { id: 'graph', width: 400, height: 300 },
