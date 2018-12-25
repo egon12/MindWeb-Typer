@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+<style>
+        body {
+            font-family : 'Cantarell', 'Helvetica', 'Sans-serif';
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family : 'Aileron UltraLight';
+        }
+
+        #input-content {
+            width : 300px;
+            height : 300px;
+            opacity : 0.1;
+            position : fixed;
+            bottom : 150px;
+            right : 0;
+        }
+
+        #input-settings {
+            width : 300px;
+            height : 150px;
+            opacity : 0.1;
+            position : fixed;
+            bottom : 450px;
+            right : 0;
+        }
+
+        #input-md {
+            width : 300px;
+            height : 150px;
+            opacity : 0.1;
+            position : fixed;
+            bottom : 0;
+            right : 0;
+        }
+
+        #input-settings:focus, #input-content:focus, #input-md:focus {
+            opacity : 0.5;
+        }
+
+        #input-settings:hover, #input-content:hover, #input-md:hover {
+            opacity : 0.8 !important;
+        }
+
+        #vis, #text {
+            position : absolute;
+            top : 0;
+            left : 0;
+        }
+</style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<textarea id="input-settings"></textarea>
+<textarea id="input-content"></textarea>
+<textarea id="input-md"></textarea>
+
+<script src="../dist/mindmap.js"></script>
+<script>
+var inputContent = document.querySelector('#input-content')
+var inputSettings = document.querySelector('#input-settings')
+var inputMd = document.querySelector('#input-md')
+
+initInput(inputContent, inputSettings)
+
+</script>
+</body>
+</html>

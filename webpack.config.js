@@ -4,6 +4,7 @@ module.exports = {
   entry: {
     'dag': ['./src/dag_presenter.js'],
     'text' : ['./src/text_presenter.js'],
+    'mindmap' : ['./src/mindmap_presenter.js'],
     //'painter': ['./src/painter.new.js'],
   },
   mode: 'production',
