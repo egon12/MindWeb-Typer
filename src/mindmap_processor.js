@@ -1,13 +1,19 @@
 import treeMiddleware from './tree_middleware'
+import CircularCalculator from './circular_calculator'
 
 export default function mindmapProcessor(inputString) {
 
   const tree = treeMiddleware(inputString)
-  
-  level1PosX = [-10, 10]
-  makePosRecursive(tree, 0, tree)
 
-  return makeTreeToFlat(tree)
+  const cc = new CircularCalculator()
+
+  const newTree = cc.addRadians(tree)
+  makePos2(newTree, 0)
+  
+  //level1PosX = [-10, 10]
+  //makePosRecursive(tree, 0, tree)
+
+  return makeTreeToFlat(newTree)
 }
 
 function makeTreeToFlat(tree) {
@@ -80,5 +86,16 @@ function findInTree(tree, id) {
   }
 
   return null
+}
+
+function makePos2(tree, level) {
+  if (level == 0) {
+    tree.x = 0
+    tree.y = 0
+  } else {
+    tree.x = Math.cos(tree.radians) * 10 * level
+    tree.y = Math.sin(tree.radians) * 10 * level
+  }
+  tree.children.forEach(c => makePos2(c, level+1))
 }
 

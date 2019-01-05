@@ -1,6 +1,6 @@
 import mindmapProcessor from './mindmap_processor.js'
 
-test('Should create tree from indented string', () => {
+test.skip('Should create tree from indented string', () => {
 
   var expected = [
     { id: 'Root', name: 'Root', x: 0, y: 0, color: 'steelblue', link: [ ] },
@@ -30,7 +30,7 @@ Root
 });
 
 
-test('Should able to divide in rotation of 5 first child', () => {
+test.skip('Should able to divide in rotation of 5 first child', () => {
 
   var expected = [
     { id: 'Root', name: 'Root', x: 0, y: 0, color: 'steelblue', link: [ ] },
@@ -53,7 +53,7 @@ Root
 });
 
 
-test('Level 2 above object should set its position relative to its parent', () => {
+test.skip('Level 2 above object should set its position relative to its parent', () => {
 
   var expected = [
     { id: 'Root', name: 'Root', x: 0, y: 0, color: 'steelblue', link: [ ] },
