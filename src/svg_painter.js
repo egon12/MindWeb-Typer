@@ -29,6 +29,7 @@ export default class SVGPainter {
             .transition()
             .duration(300)
             .attr('d', this.makeD)
+            .attr('stroke', c => c.stroke)
 
         lines.enter()
             .append('path')

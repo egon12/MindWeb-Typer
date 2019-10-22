@@ -1,3 +1,5 @@
+import color from './color'
+
 const MAX_LEVEL = 50
 
 const LEVEL_MUL = -10
@@ -8,11 +10,22 @@ export default class DAG {
         if (!c) return []
         
         return c.split("\n").filter(i => i.length > 0).map(r => {
-            let newr = r.split(" ")
-            return {
+
+			let [row, meta] = r.split("|").map(i => i.trim())
+
+            let newr = row.split(" ")
+
+            let newObj = {
                 id: newr.shift(),
-                link: newr.filter(i => i.length > 0)
+                link: newr.filter(i => i.length > 0),
+				meta: meta
             }
+
+			if (color.isColor(meta)) {
+				newObj.color = meta
+			}
+
+			return newObj
         })
     }
 
@@ -108,6 +121,9 @@ export default class DAG {
             level++;
         }
 
-        return this.setXByLevel(done, level).map(i => Object.assign(i, {color : 'steelblue'}))
+        return this.setXByLevel(done, level).map(i => {
+			if (!i.color) i.color = 'steelblue'
+			return i
+		})
     }
 }
