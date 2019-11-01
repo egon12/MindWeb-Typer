@@ -74,10 +74,3 @@ object without coordinate variable, it will add lock the x variable. And add
 When we set with two variable, name and x, it will lock the x, and set the y
 back to the 0
 
- 
-
-
-
-
-
-
