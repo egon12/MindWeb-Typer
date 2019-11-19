@@ -8,7 +8,7 @@ test("normal operation", () => {
 
     const r = dag.process(content) 
     expect(r.find(i => i.id == "Base").y).toBe(0)
-    expect(r.find(i => i.id == "Account").y).toBe(-20)
+    expect(r.find(i => i.id == "Account").y).toBe(20)
     expect(r.find(i => i.id == "Message").x).toBe(1)
     expect(r.find(i => i.id == "Call").x).toBe(2)
 

@@ -2,7 +2,7 @@ import color from './color'
 
 const MAX_LEVEL = 50
 
-const LEVEL_MUL = -10
+const LEVEL_MUL = 10
 
 export default class DAG {
 
@@ -78,7 +78,7 @@ export default class DAG {
 
     setXByLevel(data, maxLevel) {
 
-        for (let y=0; y > LEVEL_MUL * maxLevel; y += LEVEL_MUL) {
+        for (let y=0; y < LEVEL_MUL * maxLevel; y += LEVEL_MUL) {
             data.filter(n => n.y == y).forEach( (d, i) => d.x = i )
         }
 
