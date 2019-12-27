@@ -15,6 +15,7 @@ export default class SVGPainter {
             .style('border', '1px solid bold')
 
         this.graph = graph
+        this.onclick = (typeof config.onclick == 'function') ? config.onclick : () => {}
     }
 
     drawNodes(nodes, config) {
@@ -56,6 +57,7 @@ export default class SVGPainter {
 
     drawRects(nodes, config) {
         const rects = this.graph.selectAll('rect').data(nodes, i => i.id)
+        const onclick = this.onclick
 
         rects.transition()
             .duration(600)
@@ -74,6 +76,7 @@ export default class SVGPainter {
             .attr('y', d => d.r_y)
             .attr('width', config.rect.width)
             .attr('height', config.rect.height)
+            .on('click', d => onclick(d.id))
 
             .transition()
             .duration(600)
