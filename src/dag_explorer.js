@@ -12,12 +12,11 @@ class DagExplorer {
 		this.painter = new SVGPainter()
 		this.painter.init(config)
 
-		this.painter.onclick = this.clickId
 
-		this.text = new DagEplorerTextManager(content)
+		this.text = new DagExplorerTextManager(content)
 
 		this.draw = this.draw.bind(this)
-		this.clickId = this.clickId.bind(this)
+		this.painter.onclick = this.clickId.bind(this)
 	}
 
 	clickRoot() {
@@ -27,7 +26,7 @@ class DagExplorer {
 
 	clickId(id) {
 		const content = this.text.getID(id)
-		this.draw(context)
+		this.draw(content)
 	}
 
 	draw(content) {
@@ -39,5 +38,23 @@ class DagExplorer {
 	}
 }
 
-const explorer = new DagExplorer(global.content)
 
+const config = {
+    container: { 
+		id: '#container', 
+		width: global.innerWidth - 10,
+		height: global.innerHeight - 10 
+	},
+    rect: { 
+		width: global.innerWidth / 10, 
+		height: global.innerHeight / 10, 
+	},
+    font: { 
+		family: 'Helvetica', 
+		size: 14 
+	}
+}
+
+const explorer = new DagExplorer(global.dag_content, config)
+explorer.clickRoot()
+global.document.querySelector('#reset').onclick = () => explorer.clickRoot()

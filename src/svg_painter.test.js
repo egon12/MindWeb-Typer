@@ -1,5 +1,6 @@
 import SVGPainter from './svg_painter'
 
+
 test.skip('test svg_painter', () => {
 
     const config = { 
@@ -8,13 +9,17 @@ test.skip('test svg_painter', () => {
         font: { family: 'Helvetica', size: 14 }
     }
 
+    document.body.innerHTML = '<html><svg id="graph"></svg></html>'
+    expect(document.body).toBeUndefined()
+
     const p = new SVGPainter(config)
+
+    expect(p.document).not.toBeUndefined()
+
 
     const nodes = [
         { r_x: 200, r_y : 150, color: 'steelblue' }
     ]
 
     p.drawNodes(nodes, config)
-
-
 })

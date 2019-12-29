@@ -10,7 +10,7 @@ test('getRoot should get all content', () => {
 
 test('getID should filter that have that id in dependencies', () => {
 	const content = "A B C\nB C\nD C\nE F\nF B Z"
-	const expected = "A B\nB C\nF B"
+	const expected = "B C\nA B\nF B\nC"
 
 	const tm = new DagExplorerTextManager(content)
 
