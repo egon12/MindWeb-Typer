@@ -15,6 +15,9 @@ export default class SVGPainter {
             .style('border', '1px solid bold')
 
         this.graph = graph
+        this.lines = graph.append('g')
+		    this.nodes = graph.append('g')
+        this.onclick = (typeof config.onclick == 'function') ? config.onclick : () => {}
     }
 
     drawNodes(nodes, config) {
@@ -23,7 +26,7 @@ export default class SVGPainter {
     }
 
     drawEdges(edges, config) {
-        const lines = this.graph.selectAll('path').data(edges, i => i.from.id + i.to.id)
+        const lines = this.lines.selectAll('path').data(edges, i => i.from.id + i.to.id)
 
         lines
             .transition()
@@ -55,7 +58,8 @@ export default class SVGPainter {
     }
 
     drawRects(nodes, config) {
-        const rects = this.graph.selectAll('rect').data(nodes, i => i.id)
+        const rects = this.nodes.selectAll('rect').data(nodes, i => i.id)
+        const onclick = this.onclick
 
         rects.transition()
             .duration(600)
@@ -74,6 +78,7 @@ export default class SVGPainter {
             .attr('y', d => d.r_y)
             .attr('width', config.rect.width)
             .attr('height', config.rect.height)
+            .on('click', d => onclick(d.id))
 
             .transition()
             .duration(600)
@@ -88,7 +93,8 @@ export default class SVGPainter {
     }
 
     drawTexts(nodes, config) {
-        const texts = this.graph.selectAll('text').data(nodes, i => i.id)
+        const texts = this.nodes.selectAll('text').data(nodes, i => i.id)
+        const onclick = this.onclick
 
         texts
             .text(d => d.id)
@@ -108,6 +114,7 @@ export default class SVGPainter {
             .attr('text-anchor', 'middle')
             .attr('x', d => d.r_x + config.rect.width / 2)
             .attr('y', d => d.r_y + config.rect.height / 2)
+            .on('click', d => onclick(d.id))
 
         texts.exit()
             .transition()
