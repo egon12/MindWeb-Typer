@@ -12,6 +12,7 @@ function makeTree(words) {
   var root = { id: words[0], children: [] }
   var parent = root
 
+
   for (let i=1; i<words.length; i++) {
     const w = words[i].trim()
     const l = getLevel(words[i])
@@ -50,7 +51,7 @@ function findInTreeLastObjectOnLevel(tree, level) {
 
 
 function getLevel(word) {
-  return countSpaces(word) / 2
+  return countSpaces(word)
 }
 
 function countSpaces(word) {

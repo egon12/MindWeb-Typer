@@ -17,14 +17,41 @@ test('Should create tree from indented string', () => {
 
   const input = `
 Root
-  RootChild1
-    ChildFrom1_1
-    ChildFrom1_2
-    ChildFrom1_3
-  RootChild2
-    ChildFrom2_1
-    ChildFrom2_2
-    ChildFrom2_3
+ RootChild1
+  ChildFrom1_1
+  ChildFrom1_2
+  ChildFrom1_3
+ RootChild2
+  ChildFrom2_1
+  ChildFrom2_2
+  ChildFrom2_3
 `;
   expect(treeMiddleware(input)).toEqual(expected);
+});
+
+test('Should not failed this one', () => {
+
+  var expected = { id: 'Self', children: [
+    { id: 'Work', parentId: 'Self', children: [] },
+    { id: 'Family', parentId: 'Self', children: [
+      { id: 'Child', parentId: 'Family', children: []},
+    ] },
+    { id: 'Learn', parentId: 'Self', children: [
+      { id: 'WebRTC', parentId: 'Learn', children: []},
+    ] },
+  ] }
+
+
+  const input = `
+Self
+ Work
+ Family
+  Child
+
+ Learn
+  WebRTC
+`
+
+  expect(treeMiddleware(input)).toEqual(expected);
+
 });
