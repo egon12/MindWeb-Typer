@@ -22,9 +22,11 @@
   },
   "homepage": "https://github.com/egon12/MindWeb-Typer#readme",
   "devDependencies": {
+    "@babel/plugin-proposal-pipeline-operator": "^7.10.1",
     "@babel/preset-env": "^7.9.6",
     "jest": "^25.5.4",
     "jsdom": "^15.2.1",
+    "prettier": "2.0.5",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11"
   },
@@ -41,6 +43,14 @@
   "babel": {
     "presets": [
       "@babel/preset-env"
+    ],
+    "plugins": [
+      [
+        "@babel/plugin-proposal-pipeline-operator",
+        {
+          "proposal": "smart"
+        }
+      ]
     ]
   },
   "jest": {
