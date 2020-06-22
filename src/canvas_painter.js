@@ -2,7 +2,7 @@ import { select } from "d3-selection";
 
 import { timer } from "d3-timer";
 
-import SVGPainter from "./svg_painter.js";
+import SVGPainter from "./svg_painter";
 
 export default class CanvasPainter extends SVGPainter {
 	init(config) {

@@ -1,7 +1,7 @@
 import DAG from "./dag";
 import PositionCalculator from "./position_calculator";
-import SVGPainter from "./svg_painter";
-import DagExplorerTextManager from "./dag_explorer_text_manager.js";
+import SVGPainter from "./interactive_svg_painter";
+import DagExplorerTextManager from "./dag_explorer_text_manager";
 
 class DagExplorer {
 	constructor(content, config) {
