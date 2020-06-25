@@ -15,8 +15,17 @@ const jsconfig = {
 		path: path.resolve(__dirname, "dist"),
 		filename: "[name].js"
 	},
+	devServer: {
+		contentBase: path.join(__dirname, 'dist'),
+		compress: true,
+		port: 9000
+	},
 
 	plugins: [
+		new HtmlWebpackPlugin({
+			chunks: ['dag_explorer'],
+			template: 'src/dag_explorer.ejs',
+		}),
 		new DagExplorerWebpackPlugin(),
 	]
 };

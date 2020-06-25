@@ -6,24 +6,25 @@ export default class SVGPainter {
 		const cc = config.container;
 		const base = select(cc.id);
 
-		base.selectAll("svg").remove();
+		base.selectAll('svg').remove();
 
 		const graph = base
-			.append("svg")
-			.attr("width", cc.width)
-			.attr("height", cc.height)
-			.style("border", "1px solid bold");
+			.append('svg')
+			.attr('width', cc.width)
+			.attr('height', cc.height)
+			.style('border', '1px solid bold');
 
 		this.graph = graph;
-		this.lines = graph.append("g");
-		this.nodes = graph.append("g");
+		this.lines = graph.append('g');
+		this.nodes = graph.append('g');
 		this.onclick =
-			typeof config.onclick == "function" ? config.onclick : () => {};
+			typeof config.onclick == 'function' ? config.onclick : () => {};
 	}
 
 	drawNodes(nodes, config) {
 		this.drawRects(nodes, config);
 		this.drawTexts(nodes, config);
+		this.drawExpandToggle(nodes, config);
 	}
 
 	drawEdges(edges, config) {
@@ -40,19 +41,20 @@ export default class SVGPainter {
 		lines
 			.enter()
 			.append("path")
-			.attr("stroke", "white")
-			.attr("stroke-width", "10")
 			.attr("fill", "none")
+			.attr("stroke", c => c.stroke)
+			.attr("stroke-width", "10")
+			.attr("stroke-opacity", "0.0")
 			.attr("d", this.makeD)
 			.transition()
 			.duration(600)
-			.attr("stroke", c => c.stroke);
+			.attr("stroke-opacity", "1.0");
 
 		lines
 			.exit()
 			.transition()
 			.duration(600)
-			.attr("stroke", "white")
+			.attr("stroke-opacity", "0.0")
 			.remove();
 	}
 
@@ -80,8 +82,9 @@ export default class SVGPainter {
 		rects
 			.enter()
 			.append("rect")
-			.attr("fill", "white")
-			.attr("color", "white")
+			.attr("fill", d => d.color)
+			.attr("fill-opacity", "0.0")
+			.attr("color", "none")
 			.attr("x", d => d.r_x)
 			.attr("y", d => d.r_y)
 			.attr("width", config.rect.width)
@@ -90,12 +93,18 @@ export default class SVGPainter {
 
 			.transition()
 			.duration(600)
-			.attr("fill", d => d.color);
+			.attr("fill-opacity", "1.0");
 
-		rects.exit().transition().duration(600).attr("fill", "white").remove();
+		rects
+			.exit()
+			.transition()
+			.duration(600)
+			.attr("fill-opacity", "0.0")
+			.remove();
 	}
 
 	drawTexts(nodes, config) {
+		console.log(nodes);
 		const texts = this.nodes.selectAll("text").data(nodes, i => i.id);
 		const onclick = this.onclick;
 
@@ -121,5 +130,42 @@ export default class SVGPainter {
 			.on("click", d => onclick(d.id));
 
 		texts.exit().transition().duration(600).remove();
+	}
+
+	drawExpandToggle(nodes, config) {
+		const circle = this.nodes.selectAll("circle").data(
+			nodes.filter(n => n.isGroup),
+			i => i.id
+		);
+		const onclick = this.onclick;
+
+		circle
+			.transition()
+			.duration(600)
+			.attr("cx", d => config.rect.width + d.r_x)
+			.attr("cy", d => d.r_y)
+			.attr("r", config.expandToggle.radius);
+
+		// todo maybe try to delete attr, attr y and attr others?
+		circle
+			.enter()
+			.append("circle")
+			.attr("fill", "mediumvioletred")
+			.attr("cx", d => config.rect.width + d.r_x)
+			.attr("cy", d => d.r_y)
+			.attr("r", config.expandToggle.radius)
+			.attr("fill-opacity", "0.0")
+			.on("click", d => onclick(d.id))
+
+			.transition()
+			.duration(600)
+			.attr("fill-opacity", "1.0");
+
+		circle
+			.exit()
+			.transition()
+			.duration(600)
+			.attr("fill-opacity", "0")
+			.remove();
 	}
 }

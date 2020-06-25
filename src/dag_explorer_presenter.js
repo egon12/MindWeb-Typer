@@ -46,10 +46,14 @@ const config = {
 		width: global.innerWidth / 10,
 		height: global.innerHeight / 10
 	},
+	expandToggle: {
+		radius: 10,
+	},
 	font: {
 		family: "Helvetica",
 		size: 14
 	}
+
 };
 
 const explorer = new DagExplorer(global.dag_content, config);
