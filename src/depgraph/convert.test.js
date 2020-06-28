@@ -118,6 +118,51 @@ Comment Post
 	);
 });
 
+test('DepGraph should able to check is one node bounded (have connection) to another node', () => {
+	const content = `
+B
+A B C D
+D E F
+G H I
+J B
+C
+H
+I
+E
+F
+`
+	const nodesObj = convert(content)
+
+	const dg =  new DepGraph(nodesObj)
+
+	expect(dg.isBounded('A', 'B')).toBe(true)
+	expect(dg.isBounded('A', 'J')).toBe(true)
+	expect(dg.isBounded('A', 'J', ['B'])).toBe(false)
+	expect(dg.isBounded('A', 'G')).toBe(false)
+	expect(dg.isBounded('A', 'I')).toBe(false)
+})
+
+test('DepGraph should able to seperate between to free tree', () => {
+	const content = `
+B
+A B C D
+D E F
+G H I
+J B
+C
+H
+I
+E
+F
+`
+	const nodesObj = convert(content)
+
+	const dg =  new DepGraph(nodesObj)
+
+	expect(dg.uniqueTree()).toEqual(['A', 'G'])
+})
+
+
 
 
 test.skip("normal operation", () => {
@@ -154,3 +199,5 @@ test.skip("should have color", () => {
 	expect(r.find(i => i.id == "Common").color).toBe("steelblue");
 	expect(r.find(i => i.id == "Account").color).toBe("steelblue");
 });
+
+

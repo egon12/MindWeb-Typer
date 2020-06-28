@@ -1,8 +1,12 @@
-
 export class Nodes {
 
 	constructor(nodes) {
 		this.nodes = nodes
+		this.get = this.get.bind(this)
+	}
+
+	get(name) {
+		return this.nodes[name]
 	}
 
 	filter(func) {
@@ -29,12 +33,31 @@ export class DepGraph extends Nodes {
 		this._setLevel()
 	}
 
-	get(name) {
-		return this.nodes[name]
+	isBounded(name1, name2, exclude) {
+		const node1 = this.get(name1)
+		const node2 = this.get(name2)
+		const excludeNodes = exclude ? exclude.map(this.get): []
+		
+		return isBounded(node1, node2, excludeNodes)
+	}
+
+	uniqueTree(exclude) {
+		const excludeNodes = exclude ? exclude.map(this.get) : []
+
+		const cluster = clustering(this.getZeroImportBy(), (groups, node) => {
+			for (let id in groups) {
+				if (isBounded(groups[id][0], node, excludeNodes)) {
+					return id
+				}
+			}
+			return node.name
+		})
+
+
+		return Object.values(cluster).map(ns => ns[0].name)
 	}
 
 	_setLevel() {
-		
 		this.getZeroDependencies().forEach(n => setDependencyLevel(n, 0))
 	}
 
@@ -52,8 +75,6 @@ export class DepGraph extends Nodes {
 		}
 		zeroDependencies.forEach(checkImportCyclic)
 	}
-
-
 }
 
 export function convert(content) {
@@ -99,11 +120,6 @@ function setDependencyLevel(node, level) {
 	node.importBy.forEach(n => setDependencyLevel(n, level+1))
 }
 
-function setImportLevel(node, level) {
-	node.importBy = level
-	node.dependencies.forEach(n => setDependencyLevel(n, level+1))
-}
-
 function checkCyclic(node, prevNodes, getChildren) {
 	const index = prevNodes.indexOf(node)
 	if (index > -1) {
@@ -126,4 +142,43 @@ function checkImportCyclic(node) {
 	checkCyclic(node, [], n => n.importBy)
 }
 
+function isBounded(node1, node2, excluded) {
+
+	let found = node1.importBy.find(i => i == node2)
+	if (found) return true
+
+	found = node1.dependencies.find(i => i == node2)
+	if (found) return true
+
+	excluded = [...excluded, node1];
+
+	for (let i=0; i<node1.importBy.length; i++) {
+		const node1link = node1.importBy[i]
+		if (excluded.find(i => i == node1link)) {
+			continue
+		}
+		found = isBounded(node1link, node2, excluded)
+		if (found) return true
+	}
+
+	for (let i=0; i<node1.dependencies.length; i++) {
+		const node1link = node1.dependencies[i]
+		if (excluded.find(i => i == node1link)) {
+			continue
+		}
+		found = isBounded(node1link, node2, excluded)
+		if (found) return true
+	}
+
+	return false
+}
+
+function clustering(nodes, getGroupId) {
+	return nodes.reduce((groups, node) => {
+		const id = getGroupId(groups, node);
+		groups[id] = groups[id] || []
+		groups[id].push(node);
+		return groups;
+	}, {});
+}
 
