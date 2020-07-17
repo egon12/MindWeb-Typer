@@ -1,81 +1,4 @@
-export class Nodes {
-
-	constructor(nodes) {
-		this.nodes = nodes
-		this.get = this.get.bind(this)
-	}
-
-	get(name) {
-		return this.nodes[name]
-	}
-
-	filter(func) {
-		return Object.keys(this.nodes)
-			.map(name => this.nodes[name])
-			.filter(func)
-	}
-
-	getZeroDependencies() {
-		return this.filter(node => node.dependencies.length == 0)
-	}
-
-	getZeroImportBy() {
-		return this.filter(node => node.importBy.length == 0)
-	}
-
-}
-
-export class DepGraph extends Nodes {
-
-	constructor(nodes) {
-		super(nodes)
-		this._checkAcyclic()
-		this._setLevel()
-	}
-
-	isBounded(name1, name2, exclude) {
-		const node1 = this.get(name1)
-		const node2 = this.get(name2)
-		const excludeNodes = exclude ? exclude.map(this.get): []
-		
-		return isBounded(node1, node2, excludeNodes)
-	}
-
-	uniqueTree(exclude) {
-		const excludeNodes = exclude ? exclude.map(this.get) : []
-
-		const cluster = clustering(this.getZeroImportBy(), (groups, node) => {
-			for (let id in groups) {
-				if (isBounded(groups[id][0], node, excludeNodes)) {
-					return id
-				}
-			}
-			return node.name
-		})
-
-
-		return Object.values(cluster).map(ns => ns[0].name)
-	}
-
-	_setLevel() {
-		this.getZeroDependencies().forEach(n => setDependencyLevel(n, 0))
-	}
-
-	_checkAcyclic() {
-		const zeroImport = this.getZeroImportBy()
-		if (zeroImport.length == 0) {
-			throw new Error("DepGraph should be acyclic. Cannot find the end of Graph")
-		}
-		zeroImport.forEach(checkDependencyCyclic)
-
-
-		const zeroDependencies = this.getZeroDependencies()
-		if (zeroDependencies.length == 0) {
-			throw new Error("DepGraph should be acyclic. Cannot find the end of Graph")
-		}
-		zeroDependencies.forEach(checkImportCyclic)
-	}
-}
+import DepGraph from "./depgraph";
 
 export function convert(content) {
 	const arrOfArr = content
@@ -83,102 +6,82 @@ export function convert(content) {
 		.map(i => i.split(" ").filter(i => i.length > 0))
 		.filter(i => i.length > 0);
 
-	const allNodes = {}
+	const allNodes = {};
 
 	arrOfArr
 		.map(i => i[0])
-		.forEach(i => allNodes[i] = {name: i, dependencies: [], importBy: []})
+		.forEach(
+			i => (allNodes[i] = { id: i, dependencies: [], importBy: [] })
+		);
 
-	arrOfArr.filter(i => i.length > 1).forEach(i => {
-		const node = allNodes[i[0]]
+	arrOfArr
+		.filter(i => i.length > 1)
+		.forEach(i => {
+			const node = allNodes[i[0]];
 
-		for (let j=1; j<i.length; j++) {
-			const name = i[j]
+			for (let j = 1; j < i.length; j++) {
+				const id = i[j];
 
-			if (node.name == name) {
-				throw new Error(`"${name}" cannot import it self`)
+				if (node.id == id) {
+					throw new Error(`"${id}" cannot import it self`);
+				}
+
+				const dependencyNode = allNodes[id];
+				if (!dependencyNode) {
+					throw new Error(`Cannot find node "${id}"`);
+				}
+
+				dependencyNode.importBy.push(node);
+				node.dependencies.push(dependencyNode);
 			}
+		});
 
-			const dependencyNode = allNodes[name]
-			if (!dependencyNode) {
-				throw new Error(`Cannot find node "${name}"`)
-			}
+	return allNodes;
+}
 
-			dependencyNode.importBy.push(node)
-			node.dependencies.push(dependencyNode)
-		}
+export function convertToDepGraph(content) {
+	const nodes = convert(content);
+	return new DepGraph(nodes);
+}
+
+export function toDrawableData(depgraph) {
+	return Object.values(depgraph.nodes).map(i => ({
+		id: i.id,
+		link: i.dependencies.map(j => j.id),
+		x: i.x,
+		y: 100 * i.dependencyLevel,
+		color: 'steelblue',
+	}))
+}
+
+export function toThreeLevel(dg, id) {
+
+	const node = dg.get(id)
+
+	const maxX = Math.max(node.dependencies.length, node.importBy.length)
+	
+	const ds = toThreeLevelDrawable(node.dependencies, id, 0, maxX)
+	const ib = toThreeLevelDrawable(node.importBy, id, 200, maxX)
+	const all = ds.concat(ib)
+
+	all.push({
+		id: node.id,
+		link: [id],
+		color: 'steelblue',
+		x: (maxX + 1) / 2,
+		y: 100,
 	})
 
-	return allNodes
+	return all
 }
 
-function setDependencyLevel(node, level) {
-	if (node.dependencyLevel && level <= node.dependencyLevel) {
-		return
-	}
-	node.dependencyLevel = level
-	node.importBy.forEach(n => setDependencyLevel(n, level+1))
+function toThreeLevelDrawable(nodes, linkId, y, maxX) {
+	const mtpl = (maxX + 1) /  (nodes.length + 1)
+	return nodes.map((n, i) => ({
+		id: n.id,
+		link: [linkId],
+		color: 'steelblue',
+		y,
+		x: (i + 1) * mtpl
+	}))
 }
-
-function checkCyclic(node, prevNodes, getChildren) {
-	const index = prevNodes.indexOf(node)
-	if (index > -1) {
-		const cyclicArr = prevNodes.filter( (p,i) => i >= index )
-		cyclicArr.push(node)
-		const cyclicInfo = cyclicArr.map(i => i.name).join(" -> ")
-		throw new Error("Cyclic on " + cyclicInfo)
-	}
-
-	getChildren(node).forEach(n => {
-		checkCyclic(n, [...prevNodes, node], getChildren)
-	})
-}
-
-function checkDependencyCyclic(node) {
-	checkCyclic(node, [], n => n.dependencies)
-}
-
-function checkImportCyclic(node) {
-	checkCyclic(node, [], n => n.importBy)
-}
-
-function isBounded(node1, node2, excluded) {
-
-	let found = node1.importBy.find(i => i == node2)
-	if (found) return true
-
-	found = node1.dependencies.find(i => i == node2)
-	if (found) return true
-
-	excluded = [...excluded, node1];
-
-	for (let i=0; i<node1.importBy.length; i++) {
-		const node1link = node1.importBy[i]
-		if (excluded.find(i => i == node1link)) {
-			continue
-		}
-		found = isBounded(node1link, node2, excluded)
-		if (found) return true
-	}
-
-	for (let i=0; i<node1.dependencies.length; i++) {
-		const node1link = node1.dependencies[i]
-		if (excluded.find(i => i == node1link)) {
-			continue
-		}
-		found = isBounded(node1link, node2, excluded)
-		if (found) return true
-	}
-
-	return false
-}
-
-function clustering(nodes, getGroupId) {
-	return nodes.reduce((groups, node) => {
-		const id = getGroupId(groups, node);
-		groups[id] = groups[id] || []
-		groups[id].push(node);
-		return groups;
-	}, {});
-}
-
