@@ -1,34 +1,33 @@
-import DAG from "./dag";
 import PositionCalculator from "./position_calculator";
 import SVGPainter from "./interactive_svg_painter";
-import DagExplorerTextManager from "./dag_explorer_text_manager";
+import { convertToDepGraph, toDrawableData, toThreeLevel } from './depgraph/convert'
+import { calculate } from './depgraph/pos_calculator'
 
 class DagExplorer {
 	constructor(content, config) {
 		this.config = config;
-		this.dag = new DAG();
 		this.position = new PositionCalculator();
 		this.painter = new SVGPainter();
 		this.painter.init(config);
 
-		this.text = new DagExplorerTextManager(content);
 
 		this.draw = this.draw.bind(this);
 		this.painter.onclick = this.clickId.bind(this);
+
+		this.rootDG = convertToDepGraph(content)
 	}
 
 	clickRoot() {
-		const content = this.text.getRoot();
-		this.draw(content);
+		calculate(this.rootDG)
+		this.draw(toDrawableData(this.rootDG))
 	}
 
 	clickId(id) {
-		const content = this.text.getID(id);
-		this.draw(content);
+		const all = toThreeLevel(this.rootDG, id)
+		this.draw(all)
 	}
 
-	draw(content) {
-		const data = this.dag.process(content);
+	draw(data) {
 		const nodes = this.position.calculateNodePosition(data, this.config);
 		const edges = this.position.calculateEdgePoints(nodes, this.config);
 		this.painter.drawEdges(edges, this.config);
