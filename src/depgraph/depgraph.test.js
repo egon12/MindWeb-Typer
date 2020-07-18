@@ -128,3 +128,25 @@ F
 
 	expect(dg.uniqueTree()).toEqual(['A', 'G'])
 })
+
+
+test.skip('DepGraph should able to seperate between to free tree and make it flat', () => {
+	const content = `
+B
+A B C D
+D E F
+G H I
+J B
+C
+H
+I
+E
+F
+`
+	const nodesObj = convert(content)
+
+	const dg =  new DepGraph(nodesObj)
+	const trees = dg.uniqueTreeObject()
+
+	expect(trees[0].map(i => i.id)).toEqual(['B', 'A', 'D', 'J', 'C', 'E', 'F'])
+})

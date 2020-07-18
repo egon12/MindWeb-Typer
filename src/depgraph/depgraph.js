@@ -19,7 +19,21 @@ export default class DepGraph extends Nodes {
 	uniqueTree(exclude) {
 		const excludeNodes = exclude ? exclude.map(this.get) : []
 
-		const cluster = clustering(this.getZeroImportBy(), (groups, node) => {
+		const cluster = this._cluster(excludeNodes)
+
+		return Object.values(cluster).map(ns => ns[0].id)
+	}
+
+	uniqueTreeObject(exclude) {
+		const excludeNodes = exclude ? exclude.map(this.get) : []
+
+		const cluster = this._cluster(excludeNodes)
+
+		return Object.keys(cluster).map(k => flattenTree(cluster[k][0], excludeNodes))
+	}
+
+	_cluster(excludeNodes) {
+		return clustering(this.getZeroImportBy(), (groups, node) => {
 			for (let id in groups) {
 				if (isBounded(groups[id][0], node, excludeNodes)) {
 					return id
@@ -27,9 +41,6 @@ export default class DepGraph extends Nodes {
 			}
 			return node.id
 		})
-
-
-		return Object.values(cluster).map(ns => ns[0].id)
 	}
 
 	_setLevel() {
@@ -125,4 +136,14 @@ function isBounded(node1, node2, excluded) {
 	return false
 }
 
-
+function flattenTree(tree, exclude) {
+	let res = tree.dependencies.filter(i => !exclude.find(j => i.id == j.id))
+	res.forEach(n => {
+		n.dependencies.forEach (m => {
+			const childs = flattenTree(m, exclude)
+			res = res.concat(childs)
+		})
+	})
+	res.push(tree)
+	return res
+}

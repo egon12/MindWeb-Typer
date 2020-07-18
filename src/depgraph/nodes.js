@@ -7,7 +7,11 @@ export default class Nodes {
 	}
 
 	get(id) {
-		return this.nodes[id]
+		const node =  this.nodes[id]
+		if (!node) {
+			throw new Error("Cannot find " + id)
+		}
+		return node
 	}
 
 	filter(func) {
