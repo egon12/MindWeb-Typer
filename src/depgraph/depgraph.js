@@ -21,7 +21,10 @@ export default class DepGraph extends Nodes {
 
 		const cluster = this._cluster(excludeNodes)
 
-		return Object.values(cluster).map(ns => ns[0].id)
+		return Object.keys(cluster).reduce((o, id) => ({
+			...o, 
+			['Tree ' + id]: flattenTree(cluster[id][0], excludeNodes)
+		}), {})
 	}
 
 	uniqueTreeObject(exclude) {
@@ -45,6 +48,7 @@ export default class DepGraph extends Nodes {
 
 	_setLevel() {
 		this.getZeroDependencies().forEach(n => setDependencyLevel(n, 0))
+		this.getZeroImportBy().forEach(n => setImportLevel(n, 0))
 	}
 
 	_checkAcyclic() {
@@ -93,6 +97,14 @@ function setDependencyLevel(node, level) {
 	}
 	node.dependencyLevel = level
 	node.importBy.forEach(n => setDependencyLevel(n, level+1))
+}
+
+function setImportLevel(node, level) {
+	if (node.importLevel && level <= node.importLevel) {
+		return
+	}
+	node.importLevel = level
+	node.dependencies.forEach(n => setImportLevel(n, level+1))
 }
 
 function clustering(nodes, getGroupId) {
@@ -147,3 +159,21 @@ function flattenTree(tree, exclude) {
 	res.push(tree)
 	return res
 }
+
+
+/*
+
+DepGraph interface 
+
+let's try
+
+createDepGraph(content)
+
+dg.uniqueTree(exclude)
+
+dg.tree(id, exclude)
+
+calculate(dg, useImport)
+
+dg.get(id)
+*/

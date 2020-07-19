@@ -1,4 +1,7 @@
 import DepGraph from "./depgraph";
+import DrawableDepGraph from './drawable_depgraph'
+
+
 
 export function convert(content) {
 	const arrOfArr = content
@@ -44,12 +47,17 @@ export function convertToDepGraph(content) {
 	return new DepGraph(nodes);
 }
 
+export function convertToDrawableDepGraph(content) {
+	const nodes = convert(content);
+	return new DrawableDepGraph(nodes);
+}
+
 export function toDrawableData(depgraph) {
 	return Object.values(depgraph.nodes).map(i => ({
 		id: i.id,
 		link: i.dependencies.map(j => j.id),
 		x: i.x,
-		y: 100 * i.dependencyLevel,
+		y: i.y,
 		color: 'steelblue',
 	}))
 }

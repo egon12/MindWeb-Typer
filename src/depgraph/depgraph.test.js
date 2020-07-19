@@ -126,7 +126,9 @@ F
 
 	const dg =  new DepGraph(nodesObj)
 
-	expect(dg.uniqueTree()).toEqual(['A', 'G'])
+	const trees = dg.uniqueTree()
+
+	expect(Object.keys(trees)).toEqual(['Tree A', 'Tree G'])
 })
 
 
