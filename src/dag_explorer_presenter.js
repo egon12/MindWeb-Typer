@@ -6,6 +6,7 @@ import { convertToDrawableDepGraph } from './depgraph/convert'
 // maybe we need to present with state like redux or something
 const viewType = {
 	SELECT_TREE: 'select_tree',
+	LIST: 'list',
 	TREE: 'tree',
 	NODE: 'node',
 }
@@ -16,6 +17,7 @@ const state = {
 	trees: {},
 	selectedTree: "",
 	selectedNode: "",
+	nodeList: [],
 	useImportLevel: false,
 	uniqueTreeExclude: [],
 }
@@ -28,30 +30,36 @@ const actionType = {
 	CLICK_NODE: 'click_node',
 	CTRL_CLICK_NODE: 'ctrl_click_node',
 	USE_IMPORT_CHANGE: 'use_import_change',
+	CLICK_NOT_IMPORT: 'click_not_import',
 }
 
 
 
 // reducer but muttable
 function reducer(oldState, action) {
-	console.log(oldState, action)
 	switch(action.type) {
 		case actionType.CLICK_NODE: 
 		if (oldState.viewType == viewType.SELECT_TREE) {
 			oldState.viewType = viewType.TREE
 			oldState.selectedTree = action.value
-		} else if (oldState.viewType == viewType.TREE) {
+		} else if (oldState.viewType == viewType.TREE || oldState.viewType == viewType.NODE) {
 			oldState.viewType = viewType.NODE
 			oldState.selectedNode = action.value
+		} else if (oldState.viewType == viewType.LIST) {
+			oldState.viewType = viewType.TREE
+			oldState.selectedTree = action.value
 		}
 		break
 		case actionType.UP:
 		if (oldState.viewType == viewType.NODE) {
 			oldState.viewType = viewType.TREE
-		} else if (oldState.viewType == viewType.TREE) {
-			oldState.viewType = viewType.SELECT_TREE
 		}
 		break
+
+		case actionType.CLICK_ROOT:
+			oldState.viewType = viewType.TREE
+			oldState.selectedTree = 'root'
+			break
 
 		case actionType.CLICK_SELECT_TREE:
 			oldState.viewType = viewType.SELECT_TREE
@@ -61,9 +69,18 @@ function reducer(oldState, action) {
 			oldState.useImport = action.value
 			break
 
+		case actionType.CLICK_NOT_IMPORT:
+			oldState.viewType = viewType.LIST
+			oldState.nodeList = oldState.root.getZeroImportBy().map((n,i) => ({
+				id: n.id,
+				x: i%9,
+				y: parseInt(i/9),
+				color: 'steelblue',
+				link: [],
+			}))
+			break
 	}
 
-	console.log(oldState)
 	return oldState
 }
 
@@ -79,13 +96,18 @@ class DagExplorer {
 		this.draw = this.draw.bind(this);
 		this.painter.onclick = this.clickId.bind(this);
 
-
 		const rootDG = convertToDrawableDepGraph(content)
+		const trees = rootDG.getZeroImportBy()
+		.map(i => i.id)
+		.reduce((o,n) => ({
+			...o,
+			[n] : rootDG.getDrawableTreeFrom(n),
+		}), {root: rootDG})
 
 		this.state = {
 			viewType: viewType.SELECT_TREE,
 			root: rootDG,
-			trees: rootDG.getDrawableTrees(),
+			trees: trees,
 			selectedTree: "",
 			selectedNode: "",
 			useImportLevel: false,
@@ -95,13 +117,18 @@ class DagExplorer {
 		this.data = undefined
 	}
 
+	do(action) {
+		this.state = reducer(this.state, action)
+		this.drawState(this.state)
+	}
+
 	clickSelectTree() {
 		this.state = reducer(this.state, {type: actionType.CLICK_SELECT_TREE})
 		this.drawState(this.state)
 	}
 
 	clickRoot() {
-		this.state = reducer(this.state, {type: actionType.CLICK_ROOT, value: 'root'})
+		this.state = reducer(this.state, {type: actionType.CLICK_ROOT})
 		this.drawState(this.state)
 	}
 
@@ -138,6 +165,8 @@ class DagExplorer {
 			case viewType.SELECT_TREE:
 				this.drawSelectTree(state)
 				break
+			case viewType.LIST:
+				this.drawList(state)
 		}
 	}
 
@@ -156,18 +185,22 @@ class DagExplorer {
 		this.draw(data)
 	}
 
+	drawList(state) {
+		const data = state.nodeList
+		this.draw(data)
+	}
 
 }
 
 const config = {
 	container: {
 		id: "#container",
-		width: global.innerWidth - 10,
-		height: global.innerHeight - 10
+		width: global.innerWidth - 20,
+		height: global.innerHeight - 20 - 40
 	},
 	rect: {
-		width: global.innerWidth / 10,
-		height: global.innerHeight / 10
+		width: global.innerWidth / 11,
+		height: global.innerHeight / 11, 
 	},
 	expandToggle: {
 		radius: 10,
@@ -184,6 +217,6 @@ console.log(explorer)
 explorer.clickRoot();
 
 global.document.querySelector("#root").onclick = () => explorer.clickRoot();
-global.document.querySelector("#select_tree").onclick = () => explorer.clickSelectTree();
 global.document.querySelector("#up").onclick = () => explorer.clickUp();
 global.document.querySelector('#useimport').onchange = (e) => explorer.setUseImport(e.target.checked)
+global.document.querySelector('#zero_import').onclick = () => explorer.do({type: actionType.CLICK_NOT_IMPORT})
