@@ -104,32 +104,66 @@ export default class SVGPainter {
 	}
 
 	drawTexts(nodes, config) {
-		console.log(nodes);
-		const texts = this.nodes.selectAll("text").data(nodes, i => i.id);
+		const texts = this.nodes.selectAll("g.text").data(nodes, i => i.id);
 		const onclick = this.onclick;
 
 		texts
-			.text(d => d.id)
 			.transition()
 			.duration(600)
-			.attr("x", d => d.r_x + config.rect.width / 2)
-			.attr("y", d => d.r_y + config.rect.height / 2);
+			.attr("transform", d => "translate(" +(d.r_x+config.rect.width/2)+ " " +(d.r_y+config.rect.height/2)+ ")")
 
 		// todo maybe try to delete attr, attr y and attr others?
-		texts
+		const textNode = texts
 			.enter()
-			.append("text")
-			.text(d => d.id)
-			.attr("fill", "white")
-			.attr("font-family", config.font.family)
-			.attr("font-size", config.font.size)
-			.attr("dominant-baseline", "central")
-			.attr("text-anchor", "middle")
-			.attr("x", d => d.r_x + config.rect.width / 2)
-			.attr("y", d => d.r_y + config.rect.height / 2)
+			.append("g")
+			.attr("class", "text")
+			.attr("transform", d => "translate(" +(d.r_x+config.rect.width / 2)+ " " +(d.r_y+config.rect.height / 2)+ ")")
 			.on("click", d => onclick(d.id));
 
+		textNode
+			.append("text")
+			.attr("class", "l1")
+			.attr("text-anchor", "middle")
+			.attr("fill", "lightgrey")
+			.attr("font-family", config.font.family)
+			.attr("font-size", config.font.size)
+			.attr("dy", "-1.5em")
+			.text(d => this.splitText(d.id, 0));
+
+		textNode
+			.append("text")
+			.attr("class", "l2")
+			.attr("text-anchor", "middle")
+			.attr("fill", "lightgrey")
+			.attr("font-family", config.font.family)
+			.attr("font-size", config.font.size)
+			.attr("dy", "0")
+			.text(d => this.splitText(d.id, 1));
+
+		textNode
+			.append("text")
+			.attr("class", "l3")
+			.attr("text-anchor", "middle")
+			.attr("fill", "lightgrey")
+			.attr("font-family", config.font.family)
+			.attr("font-size", config.font.size)
+			.attr("dy", "1.5em")
+			.text(d => this.splitText(d.id, 2));
+
 		texts.exit().transition().duration(600).remove();
+	}
+
+	splitText(text, index) {
+		const l = text.split('/')
+		if (index == 0 && l.length > 3) {
+			return text.split('/').splice(0,3).join('/')
+		} else if (index == 1 && l.length > 3) {
+			return '/' + text.split('/').splice(3, 6).join('/')
+		} else if (index == 2 && l.length > 6) {
+			return '/' + text.split('/').splice(6).join('/')
+		} else if (index == 1 && l.length <= 3) {
+			return text
+		}
 	}
 
 	drawExpandToggle(nodes, config) {
