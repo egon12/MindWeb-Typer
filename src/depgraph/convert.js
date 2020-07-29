@@ -14,7 +14,7 @@ export function convert(content) {
 	arrOfArr
 		.map(i => i[0])
 		.forEach(
-			i => (allNodes[i] = { id: i, dependencies: [], importBy: [] })
+			i => (allNodes[i] = { id: i, dependencies: [], importBy: [], isLibrary: (i[0] != '.' && i != 'stdlib') })
 		);
 
 	arrOfArr
@@ -62,34 +62,3 @@ export function toDrawableData(depgraph) {
 	}))
 }
 
-export function toThreeLevel(dg, id) {
-
-	const node = dg.get(id)
-
-	const maxX = Math.max(node.dependencies.length, node.importBy.length)
-	
-	const ds = toThreeLevelDrawable(node.dependencies, id, 0, maxX)
-	const ib = toThreeLevelDrawable(node.importBy, id, 200, maxX)
-	const all = ds.concat(ib)
-
-	all.push({
-		id: node.id,
-		link: [id],
-		color: 'steelblue',
-		x: (maxX + 1) / 2,
-		y: 100,
-	})
-
-	return all
-}
-
-function toThreeLevelDrawable(nodes, linkId, y, maxX) {
-	const mtpl = (maxX + 1) /  (nodes.length + 1)
-	return nodes.map((n, i) => ({
-		id: n.id,
-		link: [linkId],
-		color: 'steelblue',
-		y,
-		x: (i + 1) * mtpl
-	}))
-}

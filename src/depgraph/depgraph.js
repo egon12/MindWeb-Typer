@@ -35,6 +35,11 @@ export default class DepGraph extends Nodes {
 		return Object.keys(cluster).map(k => flattenTree(cluster[k][0], excludeNodes))
 	}
 
+	getTreeFrom(id) {
+		const node = this.get(id)
+		return flattenTree(node, [])
+	}
+
 	_cluster(excludeNodes) {
 		return clustering(this.getZeroImportBy(), (groups, node) => {
 			for (let id in groups) {

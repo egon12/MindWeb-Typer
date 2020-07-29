@@ -10,7 +10,7 @@ export default class DrawableDepGraph extends DepGraph {
             link: i.dependencies.map(j => j.id),
             x: i.x,
             y: i.y,
-            color: 'steelblue',
+            color: i.isLibrary ? 'green' : 'steelblue',
         }))
     }
 
@@ -42,6 +42,10 @@ export default class DrawableDepGraph extends DepGraph {
 
         return all
     }
+
+    getDrawableTreeFrom(id) {
+        return recreateDependencies(this.getTreeFrom(id))
+    }
 }
 
 function simpleLinkDrawable(nodes, linkId, y, maxX) {
@@ -49,7 +53,7 @@ function simpleLinkDrawable(nodes, linkId, y, maxX) {
 	return nodes.map((n, i) => ({
 		id: n.id,
 		link: [linkId],
-		color: 'steelblue',
+		color: n.isLibrary ? 'green' : 'steelblue',
 		y,
 		x: (i + 1) * mtpl
 	}))
@@ -84,3 +88,27 @@ export function recreate(oldDG, nodes) {
 
     return new DrawableDepGraph(newNodes)
 }
+
+export function recreateDependencies(nodes) {
+    let newNodes = nodes.reduce((a, n) => ({...a, [n.id]: {...n}}), {})
+
+    // add missing node
+    Object.values(newNodes).forEach(n => {
+        n.dependencies.forEach(m => {
+            if (newNodes[m.id]) {
+                return
+            }
+            const oldNode = oldDG.get(m.id)
+            newNodes[m.id] = { ...oldNode }
+        })
+    })
+
+
+    Object.values(newNodes).forEach(n => { 
+        n.dependencies = n.dependencies.map(i => newNodes[i.id]).filter(i => i)
+        n.importBy = n.importBy.map(i => newNodes[i.id]).filter(i => i)
+    })
+
+    return new DrawableDepGraph(newNodes)
+}
+
