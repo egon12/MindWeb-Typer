@@ -15,8 +15,7 @@ const state = {
 	viewType: viewType.SELECT_TREE,
 	root: {},
 	trees: {},
-	selectedTree: "",
-	selectedNode: "",
+	selected: "",
 	nodeList: [],
 	useImportLevel: false,
 	uniqueTreeExclude: [],
@@ -24,13 +23,13 @@ const state = {
 
 const actionType = {
 	LOAD: 'load',
-	UP: 'up',
 	CLICK_ROOT: 'click_root',
-	CLICK_SELECT_TREE: 'click_select_tree',
 	CLICK_NODE: 'click_node',
+	CLICK_TOGGLE_TREE: 'click_toogle_tree',
 	CTRL_CLICK_NODE: 'ctrl_click_node',
 	USE_IMPORT_CHANGE: 'use_import_change',
 	CLICK_NOT_IMPORT: 'click_not_import',
+	SEARCH: 'search',
 }
 
 
@@ -39,37 +38,19 @@ const actionType = {
 function reducer(oldState, action) {
 	switch(action.type) {
 		case actionType.CLICK_NODE: 
-		if (oldState.viewType == viewType.SELECT_TREE) {
-			oldState.viewType = viewType.TREE
-			oldState.selectedTree = action.value
-		} else if (oldState.viewType == viewType.TREE || oldState.viewType == viewType.NODE) {
-			oldState.viewType = viewType.NODE
-			oldState.selectedNode = action.value
-		} else if (oldState.viewType == viewType.LIST) {
-			oldState.viewType = viewType.TREE
-			oldState.selectedTree = action.value
-		}
-		break
-		case actionType.UP:
-		if (oldState.viewType == viewType.NODE) {
-			oldState.viewType = viewType.TREE
-		}
-		break
+			if (oldState.viewType == viewType.LIST) {
+				oldState.viewType = viewType.TREE
+			}
+
+			oldState.selected = action.value
+			break
 
 		case actionType.CLICK_ROOT:
 			oldState.viewType = viewType.TREE
-			oldState.selectedTree = 'root'
+			oldState.selected = 'root'
 			break
 
-		case actionType.CLICK_SELECT_TREE:
-			oldState.viewType = viewType.SELECT_TREE
-			break
-
-		case actionType.USE_IMPORT_CHANGE:
-			oldState.useImport = action.value
-			break
-
-		case actionType.CLICK_NOT_IMPORT:
+		case actionType.CLICK_NOT_IMPORTED:
 			oldState.viewType = viewType.LIST
 			oldState.nodeList = oldState.root.getZeroImportBy().map((n,i) => ({
 				id: n.id,
@@ -79,6 +60,39 @@ function reducer(oldState, action) {
 				link: [],
 			}))
 			break
+
+		case actionType.CLICK_TOGGLE_TREE:
+			if (oldState.viewType == viewType.TREE) {
+				oldState.viewType = viewType.NODE
+			} else {
+				oldState.viewType = viewType.TREE
+			}
+			break
+
+		case actionType.SEARCH:
+			console.log(action.value.length)
+			if (action.value.length > 0) {
+				oldState.nodeList = oldState.root
+					.filter(it => it.id.indexOf(action.value) > -1)
+					.filter((it, index) => index < 60)
+					.map((n,i) => ({
+						id: n.id,
+						x: i%9,
+						y: parseInt(i/9),
+						color: 'steelblue',
+						link: [],
+					}))
+
+				oldState.viewType = viewType.LIST
+			}
+	}
+
+	console.log(oldState)
+
+	// fill caching
+	if (oldState.viewType == viewType.TREE && !oldState.trees[oldState.selected]) {
+		const d = oldState.root.getDrawableTreeFrom(oldState.selected)
+		oldState.trees[oldState.selected] = d
 	}
 
 	return oldState
@@ -97,19 +111,20 @@ class DagExplorer {
 		this.painter.onclick = this.clickId.bind(this);
 
 		const rootDG = convertToDrawableDepGraph(content)
+		/*
 		const trees = rootDG.getZeroImportBy()
 		.map(i => i.id)
 		.reduce((o,n) => ({
 			...o,
 			[n] : rootDG.getDrawableTreeFrom(n),
 		}), {root: rootDG})
+		*/
 
 		this.state = {
 			viewType: viewType.SELECT_TREE,
 			root: rootDG,
-			trees: trees,
-			selectedTree: "",
-			selectedNode: "",
+			trees: {root: rootDG},
+			selected: "",
 			useImportLevel: false,
 			uniqueTreeExclude: [],
 		}
@@ -122,18 +137,8 @@ class DagExplorer {
 		this.drawState(this.state)
 	}
 
-	clickSelectTree() {
-		this.state = reducer(this.state, {type: actionType.CLICK_SELECT_TREE})
-		this.drawState(this.state)
-	}
-
 	clickRoot() {
 		this.state = reducer(this.state, {type: actionType.CLICK_ROOT})
-		this.drawState(this.state)
-	}
-
-	clickUp() {
-		this.state = reducer(this.state, {type: actionType.UP})
 		this.drawState(this.state)
 	}
 
@@ -142,8 +147,18 @@ class DagExplorer {
 		this.drawState(this.state)
 	}
 
-	setUseImport(value) {
-		this.state = reducer(this.state, {type: actionType.USE_IMPORT_CHANGE, value})
+	clickFreeTree() {
+		this.state = reducer(this.state, {type: actionType.CLICK_NOT_IMPORTED})
+		this.drawState(this.state)
+	}
+
+	toggleTree() {
+		this.state = reducer(this.state, {type: actionType.CLICK_TOGGLE_TREE})
+		this.drawState(this.state)
+	}
+
+	search(keyword) {
+		this.state = reducer(this.state, {type: actionType.SEARCH, value: keyword})
 		this.drawState(this.state)
 	}
 
@@ -171,12 +186,12 @@ class DagExplorer {
 	}
 
 	drawNode(state) {
-		const data = state.root.getDrawableNode(state.selectedNode)
+		const data = state.root.getDrawableNode(state.selected)
 		this.draw(data)
 	}
 
 	drawTree(state) {
-		const data = state.trees[state.selectedTree].getDrawable(state.useImport)
+		const data = state.trees[state.selected].getDrawable(false)
 		this.draw(data)
 	}
 
@@ -216,7 +231,7 @@ const explorer = new DagExplorer(global.dag_content, config);
 console.log(explorer)
 explorer.clickRoot();
 
-global.document.querySelector("#root").onclick = () => explorer.clickRoot();
-global.document.querySelector("#up").onclick = () => explorer.clickUp();
-global.document.querySelector('#useimport').onchange = (e) => explorer.setUseImport(e.target.checked)
-global.document.querySelector('#zero_import').onclick = () => explorer.do({type: actionType.CLICK_NOT_IMPORT})
+global.document.querySelector("#root").onclick = explorer.clickRoot.bind(explorer)
+global.document.querySelector('#free_tree').onclick = explorer.clickFreeTree.bind(explorer)
+global.document.querySelector('#tree_toggle').onclick = explorer.toggleTree.bind(explorer)
+global.document.querySelector('#search').onchange = e => explorer.search(e.target.value)
