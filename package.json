@@ -21,7 +21,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-pipeline-operator": "^7.10.1",
     "@babel/preset-env": "^7.9.6",
-    "d3": "^5.16.0",
+    "d3": "^7.6.1",
     "html-webpack-plugin": "^4.3.0",
     "jest": "^25.5.4",
     "jsdom": "^15.2.1",
